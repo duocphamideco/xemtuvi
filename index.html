@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi">
-<head>
+<html lang="vi"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>HUYỀN · Tử Vi AI — IDECO</title>
@@ -114,7 +113,15 @@ textarea{resize:vertical}
 @media print{header,nav,.noprint,#aiCard,.toast{display:none!important}body{background:#fff;color:#000}.chart{min-width:0}}
 @media(max-width:640px){.hwrap{gap:8px}nav{margin-left:0}nav button{padding:7px 10px;font-size:13px}.card{padding:14px}}
 </style>
-</head>
+
+    <link rel="manifest" href="./manifest.json?v=3-d20a48f3-e8e802e4">
+    <link rel="icon" href="./ideco-icon-192.png?v=3-d20a48f3-e8e802e4" type="image/png">
+    <link rel="apple-touch-icon" sizes="180x180" href="./ideco-apple-touch-icon.png?v=3-d20a48f3-e8e802e4">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="XEM TỬ VI">
+    <script src="./ideco-pwa.js?v=3-d20a48f3-e8e802e4" defer=""></script>
+  </head>
 <body>
 <header><div class="hwrap">
   <div class="logo"><div class="ic">⛵</div><div><b>HUYỀN · TỬ VI AI</b><small>IDECO — lập lá số &amp; luận giải thông minh</small></div></div>
@@ -141,7 +148,7 @@ textarea{resize:vertical}
       <div><label>Năm xem vận hạn</label><input id="fView" type="number" min="1900" max="2200"></div>
     </div>
     <div class="row" style="margin-top:12px">
-      <label style="display:flex;gap:6px;align-items:center;margin:0"><input type="checkbox" id="fLateTy" checked style="width:auto"> Sinh từ 23h tính sang ngày hôm sau (giờ Tý)</label>
+      <label style="display:flex;gap:6px;align-items:center;margin:0"><input type="checkbox" id="fLateTy" checked="" style="width:auto"> Sinh từ 23h tính sang ngày hôm sau (giờ Tý)</label>
     </div>
     <div class="row" style="margin-top:14px">
       <button class="btn pri" id="btnLap">🔮 Lập lá số ngay</button>
@@ -178,7 +185,7 @@ textarea{resize:vertical}
       </div>
       <div class="chatbox" id="chatbox"><div class="muted">Chọn một chủ đề ở trên hoặc hỏi tự do về lá số (ví dụ: "Năm nay có nên đổi việc không?").</div></div>
       <div class="ask"><textarea id="askIn" rows="2" placeholder="Hỏi Huyền về lá số của bạn… (Enter để gửi, Shift+Enter xuống dòng)"></textarea><button class="btn pri" id="askBtn">Gửi</button></div>
-      <div class="row" style="margin-top:8px"><button class="btn" id="btnClearChat">🧹 Xóa hội thoại</button><button class="btn" id="btnStop" style="display:none">⏹ Dừng</button><span class="muted">Luận giải chỉ mang tính tham khảo — hãy dùng để hiểu mình và hành động tích cực.</span></div>
+      <div class="row" style="margin-top:8px"><button class="btn" id="btnClearChat">🧹 Xóa hội thoại</button><button class="btn" id="btnStop" style="display:none">⏹ Dừng</button><span class="muted">Huyền xem dựa trên đúc kết thành công thuật xem tử vi Trung Hoa tích hợp ngàn năm và phản ánh nhé</span></div>
     </div>
   </div>
 </section>
@@ -234,7 +241,7 @@ textarea{resize:vertical}
    HUYỀN · TỬ VI AI — IDECO   (BUILD 20261108-1)
    ===================================================================== */
 var CONFIG = {
-  BUILD: '20261108-3',
+  BUILD: '20261108-4',
   // Danh sách khóa Google AI Studio mặc định (thêm/bớt trong ⚙ Cài đặt). Hết hạn mức → tự chuyển khóa kế tiếp.
   GEMINI_KEYS: ['AQ.Ab8RN6LDYxbCHgiTMb2DLgtyVqpeb00y1Dp7sdpu-Xoglk3NIg'],
   // Chuỗi model: model đầu là model chính; tên sai / chưa mở thì tự tụt model kế tiếp
@@ -1144,5 +1151,6 @@ async function testKey(i){
   document.addEventListener('keydown', function(e){ if (e.key == 'Escape') closeModal(); });
 })();
 </script>
-</body>
-</html>
+
+
+</body></html>
