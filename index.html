@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HUYỀN · Tử Vi AI — IDECO</title>
+<style>
+:root{
+  --bg:#0f0d1a; --bg2:#181428; --card:#1f1a33; --line:#3a3157; --tx:#efeaf9; --tx2:#b5abd0;
+  --gold:#e8b84a; --red:#ee3a23; --ok:#3cc98a; --bad:#ff6b6b; --mid:#8fa3ff;
+  --kim:#d9dde6; --moc:#4cd28a; --thuy:#58a6ff; --hoa:#ff6a4d; --tho:#e8b84a;
+  --menh:rgba(238,58,35,.16); --tp:rgba(232,184,74,.10);
+}
+body.light{
+  --bg:#f6f2ea; --bg2:#fffaf2; --card:#ffffff; --line:#e3d8c4; --tx:#2a2238; --tx2:#6b5f80;
+  --kim:#6b7280; --moc:#15935a; --thuy:#1f6fd1; --hoa:#d6371d; --tho:#b07d10;
+  --menh:rgba(238,58,35,.10); --tp:rgba(232,184,74,.16);
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--tx);line-height:1.5;
+  background-image:radial-gradient(circle at 15% 0%,rgba(238,58,35,.12),transparent 40%),radial-gradient(circle at 90% 10%,rgba(232,184,74,.10),transparent 35%)}
+header{position:sticky;top:0;z-index:20;background:rgba(15,13,26,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+body.light header{background:rgba(255,250,242,.9)}
+.hwrap{max-width:1280px;margin:auto;display:flex;align-items:center;gap:14px;padding:10px 16px;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.5px}
+.logo .ic{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--red),#a3180a);display:grid;place-items:center;font-size:22px;box-shadow:0 4px 14px rgba(238,58,35,.4)}
+.logo b{font-size:19px;background:linear-gradient(90deg,var(--gold),#fff1c7);-webkit-background-clip:text;background-clip:text;color:transparent}
+body.light .logo b{background:linear-gradient(90deg,#b0780c,var(--red));-webkit-background-clip:text;background-clip:text}
+.logo small{display:block;font-size:11px;color:var(--tx2);font-weight:500}
+nav{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
+nav button,.btn{border:1px solid var(--line);background:var(--card);color:var(--tx);padding:8px 14px;border-radius:10px;cursor:pointer;font-size:14px;font-weight:600}
+nav button.on{background:var(--red);border-color:var(--red);color:#fff}
+.btn.pri{background:linear-gradient(135deg,var(--red),#c22a14);border-color:var(--red);color:#fff}
+.btn.gold{background:linear-gradient(135deg,var(--gold),#c99520);border-color:var(--gold);color:#2a1d00}
+.btn:hover,nav button:hover{filter:brightness(1.12)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+main{max-width:1280px;margin:auto;padding:18px 16px 60px}
+.view{display:none}.view.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:16px}
+h2{margin:0 0 12px;font-size:20px}h3{margin:14px 0 8px;font-size:16px;color:var(--gold)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+label{font-size:13px;color:var(--tx2);display:block;margin-bottom:4px}
+input,select,textarea{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg2);color:var(--tx);font-size:15px;font-family:inherit}
+textarea{resize:vertical}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.hero{text-align:center;padding:26px 10px 8px}
+.hero h1{margin:0;font-size:clamp(24px,4vw,38px);background:linear-gradient(90deg,var(--gold),var(--red));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{color:var(--tx2);margin:8px 0 0}
+.muted{color:var(--tx2);font-size:13px}
+/* ===== Lá số ===== */
+.chartwrap{overflow-x:auto;padding-bottom:6px}
+.chart{display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(4,minmax(190px,auto));gap:3px;min-width:760px;background:var(--line);border:3px solid var(--line);border-radius:12px;overflow:hidden}
+.cell{background:var(--bg2);padding:6px 7px 22px;position:relative;cursor:pointer;font-size:12.5px;transition:background .15s}
+.cell:hover{filter:brightness(1.08)}
+.cell.tp{background:linear-gradient(var(--tp),var(--tp)),var(--bg2)}
+.cell.sel{outline:2px solid var(--gold);outline-offset:-2px;z-index:2}
+.cell.menh{background:linear-gradient(var(--menh),var(--menh)),var(--bg2)}
+.ctop{display:flex;justify-content:space-between;font-size:11.5px;color:var(--tx2)}
+.cname{text-align:center;font-weight:800;font-size:13px;color:var(--gold);margin:2px 0 4px;letter-spacing:.3px}
+.cname .than{color:var(--red);font-size:10.5px;margin-left:4px;border:1px solid var(--red);padding:0 4px;border-radius:5px}
+.mstar{display:block;text-align:center;font-weight:800;font-size:14px;line-height:1.35}
+.mstar span.br{font-weight:600;font-size:10.5px;opacity:.85}
+.hoa{display:inline-block;font-size:10px;font-weight:800;padding:0 4px;border-radius:5px;margin-left:3px;color:#fff;vertical-align:1px}
+.hoa.L{background:#16a34a}.hoa.Q{background:#9333ea}.hoa.K{background:#2563eb}.hoa.Ky{background:#111;border:1px solid #888}
+.minors{display:grid;grid-template-columns:1fr 1fr;gap:0 6px;margin-top:5px;font-size:11.5px}
+.minors .g{color:var(--ok)}.minors .b{color:var(--bad)}.minors .n{color:var(--tx2)}
+.ring{font-size:10.5px;color:var(--tx2);opacity:.8;margin-top:3px;text-align:center}
+.cbot{position:absolute;left:6px;right:6px;bottom:4px;display:flex;justify-content:space-between;font-size:11px;color:var(--tx2)}
+.cbot b{color:var(--tx)}
+.tt{position:absolute;top:24px;right:4px;font-size:10px;font-weight:800;color:#fff;background:#555;padding:0 4px;border-radius:4px}
+.tt.triet{background:#7a1d10;top:40px}
+.ln{position:absolute;top:24px;left:4px;font-size:10px;font-weight:800;color:#2a1d00;background:var(--gold);padding:0 4px;border-radius:4px}
+.center{grid-column:2/4;grid-row:2/4;background:var(--card);padding:14px 16px;display:flex;flex-direction:column;justify-content:center;text-align:center;
+  background-image:radial-gradient(circle at 50% 40%,rgba(232,184,74,.12),transparent 60%)}
+.center .nm{font-size:22px;font-weight:800;color:var(--gold)}
+.center table{margin:8px auto 0;font-size:13.5px;border-collapse:collapse;text-align:left}
+.center td{padding:2px 8px}.center td:first-child{color:var(--tx2)}
+.moc{color:var(--moc)}.kim{color:var(--kim)}.thuy{color:var(--thuy)}.hoa-c{color:var(--hoa)}.tho{color:var(--tho)}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--tx2);margin-top:8px}
+/* cách cục */
+.cc{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px}
+.ccitem{border:1px solid var(--line);border-left:4px solid var(--mid);border-radius:10px;padding:10px 12px;background:var(--bg2)}
+.ccitem.good{border-left-color:var(--ok)}.ccitem.bad{border-left-color:var(--bad)}
+.ccitem b{display:block;margin-bottom:2px}
+.tag{font-size:11px;font-weight:700;padding:1px 7px;border-radius:20px;margin-left:6px}
+.tag.good{background:rgba(60,201,138,.18);color:var(--ok)}.tag.bad{background:rgba(255,107,107,.18);color:var(--bad)}.tag.mid{background:rgba(143,163,255,.18);color:var(--mid)}
+/* AI */
+.aibtns{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.aibtns button{border:1px solid var(--line);background:var(--bg2);color:var(--tx);padding:8px 12px;border-radius:20px;cursor:pointer;font-size:13.5px;font-weight:600}
+.aibtns button:hover{border-color:var(--gold);color:var(--gold)}
+.chatbox{max-height:620px;overflow-y:auto;border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--bg2);min-height:120px}
+.msg{margin:8px 0;padding:12px 14px;border-radius:12px;font-size:15.5px;line-height:1.7;max-width:96%}
+.msg.u{background:rgba(238,58,35,.14);margin-left:auto;width:fit-content;max-width:85%}
+.msg.a{background:var(--card);border:1px solid var(--line)}
+.msg.a h1,.msg.a h2,.msg.a h3,.msg.a h4{color:var(--gold);margin:10px 0 6px;font-size:16.5px}
+.msg.a ul{margin:4px 0;padding-left:22px}.msg.a p{margin:6px 0}
+.msg.a table{border-collapse:collapse;margin:8px 0;font-size:14px}.msg.a td,.msg.a th{border:1px solid var(--line);padding:4px 8px}
+.msg .who{font-size:12px;font-weight:800;color:var(--gold);margin-bottom:4px}
+.typing::after{content:"▋";animation:bl 1s infinite;color:var(--gold)}@keyframes bl{50%{opacity:0}}
+.ask{display:flex;gap:8px;margin-top:10px}.ask textarea{flex:1}
+/* modal */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:100;padding:14px}
+.modal.on{display:flex}
+.mbox{background:var(--card);border:1px solid var(--line);border-radius:16px;max-width:560px;width:100%;max-height:88vh;overflow:auto;padding:20px;position:relative}
+.mbox .x{position:absolute;top:10px;right:12px;background:none;border:0;color:var(--tx2);font-size:24px;cursor:pointer}
+.score{font-size:52px;font-weight:900;text-align:center;background:linear-gradient(90deg,var(--gold),var(--red));-webkit-background-clip:text;background-clip:text;color:transparent}
+.bar{height:10px;background:var(--bg2);border-radius:10px;overflow:hidden;border:1px solid var(--line)}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--red),var(--gold))}
+.factor{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed var(--line);font-size:14px}
+.pos{color:var(--ok);font-weight:700}.neg{color:var(--bad);font-weight:700}
+.prof{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border:1px solid var(--line);border-radius:10px;margin:6px 0;background:var(--bg2)}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:10px 18px;border-radius:10px;z-index:200;display:none;font-size:14px}
+.kb .it{border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--bg2)}
+.kb .it b{font-size:15px}
+@media print{header,nav,.noprint,#aiCard,.toast{display:none!important}body{background:#fff;color:#000}.chart{min-width:0}}
+@media(max-width:640px){.hwrap{gap:8px}nav{margin-left:0}nav button{padding:7px 10px;font-size:13px}.card{padding:14px}}
+</style>
+</head>
+<body>
+<header><div class="hwrap">
+  <div class="logo"><div class="ic">⛵</div><div><b>HUYỀN · TỬ VI AI</b><small>IDECO — lập lá số &amp; luận giải thông minh</small></div></div>
+  <nav>
+    <button data-v="lap" class="on">🔮 Lập lá số</button>
+    <button data-v="hop">💞 Xem hợp</button>
+    <button data-v="kho">📚 Kiến thức</button>
+    <button data-v="hoso">🗂 Hồ sơ</button>
+    <button id="btnSet">⚙ Cài đặt</button>
+    <button id="btnTheme" title="Đổi giao diện sáng/tối">🌓</button>
+  </nav>
+</div></header>
+
+<main>
+<!-- ========== LẬP LÁ SỐ ========== -->
+<section class="view on" id="v-lap">
+  <div class="hero"><h1>Lá số Tử Vi của bạn</h1><p>Nhập ngày giờ sinh dương lịch — Huyền tự đổi sang âm lịch, an sao và luận giải bằng AI.</p></div>
+  <div class="card noprint">
+    <div class="grid2">
+      <div><label>Họ và tên</label><input id="fName" placeholder="Nguyễn Văn A"></div>
+      <div><label>Giới tính</label><select id="fSex"><option value="1">Nam</option><option value="0">Nữ</option></select></div>
+      <div><label>Ngày sinh (dương lịch)</label><input id="fDate" type="date" value="1990-01-15"></div>
+      <div><label>Giờ sinh</label><input id="fTime" type="time" value="08:30"></div>
+      <div><label>Năm xem vận hạn</label><input id="fView" type="number" min="1900" max="2200"></div>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <label style="display:flex;gap:6px;align-items:center;margin:0"><input type="checkbox" id="fLateTy" checked style="width:auto"> Sinh từ 23h tính sang ngày hôm sau (giờ Tý)</label>
+    </div>
+    <div class="row" style="margin-top:14px">
+      <button class="btn pri" id="btnLap">🔮 Lập lá số ngay</button>
+      <button class="btn" id="btnSave">💾 Lưu hồ sơ</button>
+      <button class="btn" id="btnPrint">🖨 In / PDF</button>
+      <span class="muted" id="lunarInfo"></span>
+    </div>
+  </div>
+
+  <div id="chartArea" style="display:none">
+    <div class="card">
+      <div class="chartwrap"><div class="chart" id="chart"></div></div>
+      <div class="legend">
+        <span>Ngũ hành sao: <b class="kim">Kim</b> · <b class="moc">Mộc</b> · <b class="thuy">Thủy</b> · <b class="hoa-c">Hỏa</b> · <b class="tho">Thổ</b></span>
+        <span>Độ sáng: M Miếu · V Vượng · Đ Đắc · B Bình · H Hãm</span>
+        <span><span class="hoa L">Lộc</span><span class="hoa Q">Quyền</span><span class="hoa K">Khoa</span><span class="hoa Ky">Kỵ</span></span>
+        <span>Bấm vào cung để xem tam phương tứ chính · bấm vào sao để xem ý nghĩa</span>
+      </div>
+    </div>
+    <div class="card" id="cungDetail" style="display:none"></div>
+    <div class="card"><h2>🧭 Nhận diện cách cục</h2><div class="cc" id="ccList"></div></div>
+    <div class="card" id="aiCard">
+      <h2>🤖 Huyền luận giải</h2>
+      <div class="aibtns" id="aiBtns">
+        <button data-q="tongquan">✨ Tổng quan tính cách</button>
+        <button data-q="sunghiep">💼 Sự nghiệp</button>
+        <button data-q="tinhduyen">❤️ Tình duyên – hôn nhân</button>
+        <button data-q="tailoc">💰 Tài lộc</button>
+        <button data-q="suckhoe">🩺 Sức khỏe</button>
+        <button data-q="giadao">🏠 Gia đạo</button>
+        <button data-q="contai">👶 Con cái</button>
+        <button data-q="daihan">📈 Đại hạn 10 năm</button>
+        <button data-q="luunien">📅 Vận năm đang xem</button>
+      </div>
+      <div class="chatbox" id="chatbox"><div class="muted">Chọn một chủ đề ở trên hoặc hỏi tự do về lá số (ví dụ: "Năm nay có nên đổi việc không?").</div></div>
+      <div class="ask"><textarea id="askIn" rows="2" placeholder="Hỏi Huyền về lá số của bạn… (Enter để gửi, Shift+Enter xuống dòng)"></textarea><button class="btn pri" id="askBtn">Gửi</button></div>
+      <div class="row" style="margin-top:8px"><button class="btn" id="btnClearChat">🧹 Xóa hội thoại</button><button class="btn" id="btnStop" style="display:none">⏹ Dừng</button><span class="muted">Luận giải chỉ mang tính tham khảo — hãy dùng để hiểu mình và hành động tích cực.</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== XEM HỢP ========== -->
+<section class="view" id="v-hop">
+  <div class="hero"><h1>Xem hợp hai lá số</h1><p>So sánh can chi, ngũ hành nạp âm và cung Mệnh — AI phân tích theo từng kiểu quan hệ.</p></div>
+  <div class="grid2">
+    <div class="card"><h3>Người thứ nhất</h3>
+      <label>Họ tên</label><input id="aName" placeholder="Người A">
+      <div class="grid2" style="margin-top:8px"><div><label>Giới tính</label><select id="aSex"><option value="1">Nam</option><option value="0">Nữ</option></select></div>
+      <div><label>Ngày sinh</label><input id="aDate" type="date" value="1990-05-20"></div><div><label>Giờ sinh</label><input id="aTime" type="time" value="07:00"></div></div>
+    </div>
+    <div class="card"><h3>Người thứ hai</h3>
+      <label>Họ tên</label><input id="bName" placeholder="Người B">
+      <div class="grid2" style="margin-top:8px"><div><label>Giới tính</label><select id="bSex"><option value="0">Nữ</option><option value="1">Nam</option></select></div>
+      <div><label>Ngày sinh</label><input id="bDate" type="date" value="1992-09-10"></div><div><label>Giờ sinh</label><input id="bTime" type="time" value="14:00"></div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="row"><div style="min-width:220px;flex:1"><label>Kiểu quan hệ</label>
+      <select id="hopType"><option value="tinhduyen">Tình duyên / vợ chồng</option><option value="truochon">Tiền hôn nhân</option><option value="hoptac">Hợp tác làm ăn</option><option value="chacon">Cha mẹ – con cái</option></select></div>
+      <button class="btn pri" id="btnHop" style="margin-top:20px">💞 Bắt đầu xem hợp</button></div>
+  </div>
+  <div id="hopResult" style="display:none">
+    <div class="card"><div class="grid2"><div><div class="score" id="hopScore">0</div><div class="bar"><i id="hopBar" style="width:0"></i></div><p class="muted" style="text-align:center" id="hopVerdict"></p></div><div id="hopFactors"></div></div></div>
+    <div class="card"><h2>🤖 Huyền phân tích</h2><div class="chatbox" id="hopChat"></div></div>
+  </div>
+</section>
+
+<!-- ========== KIẾN THỨC ========== -->
+<section class="view" id="v-kho">
+  <div class="hero"><h1>Kho kiến thức</h1><p>Ý nghĩa 14 chính tinh, các cung và phụ tinh thường gặp.</p></div>
+  <div class="card"><input id="kbSearch" placeholder="🔍 Tìm sao hoặc cung… (ví dụ: Thất Sát, Quan Lộc)"></div>
+  <div class="card"><h2>⭐ 14 chính tinh</h2><div class="grid2 kb" id="kbStars"></div></div>
+  <div class="card"><h2>🏛 12 cung</h2><div class="grid2 kb" id="kbCung"></div></div>
+  <div class="card"><h2>✦ Phụ tinh</h2><div class="grid2 kb" id="kbMinor"></div></div>
+</section>
+
+<!-- ========== HỒ SƠ ========== -->
+<section class="view" id="v-hoso">
+  <div class="hero"><h1>Hồ sơ đã lưu</h1><p>Lưu trên máy và đồng bộ Firebase Realtime (khi đã cấu hình).</p></div>
+  <div class="card" id="profList"></div>
+</section>
+</main>
+
+<!-- modal -->
+<div class="modal" id="modal"><div class="mbox"><button class="x" onclick="closeModal()">×</button><div id="mbody"></div></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* =====================================================================
+   HUYỀN · TỬ VI AI — IDECO   (BUILD 20261108-1)
+   ===================================================================== */
+var CONFIG = {
+  BUILD: '20261108-3',
+  // Danh sách khóa Google AI Studio mặc định (thêm/bớt trong ⚙ Cài đặt). Hết hạn mức → tự chuyển khóa kế tiếp.
+  GEMINI_KEYS: ['AQ.Ab8RN6LDYxbCHgiTMb2DLgtyVqpeb00y1Dp7sdpu-Xoglk3NIg'],
+  // Chuỗi model: model đầu là model chính; tên sai / chưa mở thì tự tụt model kế tiếp
+  MODELS: ['gemini-3.8-flash', 'gemini-3-flash-preview', 'gemini-2.5-flash'],
+  TEMPERATURE: 0.8,
+  MAX_TOKENS: 8192,
+  TIMEOUT_MS: 120000,          // trần tổng cho 1 lượt
+  STALL_MS: 45000,             // không nhận thêm byte nào trong 45s thì cắt
+  QUOTA_COOLDOWN_MIN: 60,      // khóa hết hạn mức: tạm nghỉ 60 phút rồi mới thử lại
+  BADKEY_COOLDOWN_H: 24,       // khóa sai / hết hạn: tạm nghỉ 24 giờ
+  // Firebase Realtime Database — dán databaseURL vào đây (hoặc nhập trong ⚙ Cài đặt)
+  FIREBASE_URL: 'https://luutuvi-f14fa-default-rtdb.firebaseio.com',   // dự án luutuvi-f14fa
+  FB_NODE: 'huyenTuVi',        // nhánh lưu: /huyenTuVi/config và /huyenTuVi/profiles
+  PASS_SHA256: 'b8a57977041c2b2ba8baab472c1f0240a30b671a9fb027f9e4d73b52818b0b29',
+  PASS_DJB2: 3737427541
+};
+var LS = 'huyen-tuvi';
+console.log('[HUYEN-TUVI] build', CONFIG.BUILD);
+
+/* ---------------- tiện ích ---------------- */
+var INT = Math.floor, PI = Math.PI;
+function $(id){ return document.getElementById(id); }
+function mod(a, n){ return ((a % n) + n) % n; }
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+function toast(t){ var el = $('toast'); el.textContent = t; el.style.display = 'block'; clearTimeout(toast._t); toast._t = setTimeout(function(){ el.style.display = 'none'; }, 2600); }
+function lsGet(k, d){ try { var v = localStorage.getItem(LS + '-' + k); return v == null ? d : JSON.parse(v); } catch(e){ return d; } }
+function lsSet(k, v){ try { localStorage.setItem(LS + '-' + k, JSON.stringify(v)); } catch(e){} }
+
+/* ---------------- Âm lịch (thuật toán Hồ Ngọc Đức, múi giờ +7) ---------------- */
+function jdFromDate(dd, mm, yy){
+  var a = INT((14 - mm) / 12), y = yy + 4800 - a, m = mm + 12 * a - 3;
+  var jd = dd + INT((153 * m + 2) / 5) + 365 * y + INT(y / 4) - INT(y / 100) + INT(y / 400) - 32045;
+  if (jd < 2299161) jd = dd + INT((153 * m + 2) / 5) + 365 * y + INT(y / 4) - 32083;
+  return jd;
+}
+function getNewMoonDay(k, tz){
+  var T = k / 1236.85, T2 = T * T, T3 = T2 * T, dr = PI / 180;
+  var Jd1 = 2415020.75933 + 29.53058868 * k + 0.0001178 * T2 - 0.000000155 * T3;
+  Jd1 += 0.00033 * Math.sin((166.56 + 132.87 * T - 0.009173 * T2) * dr);
+  var M = 359.2242 + 29.10535608 * k - 0.0000333 * T2 - 0.00000347 * T3;
+  var Mpr = 306.0253 + 385.81691806 * k + 0.0107306 * T2 + 0.00001236 * T3;
+  var F = 21.2964 + 390.67050646 * k - 0.0016528 * T2 - 0.00000239 * T3;
+  var C1 = (0.1734 - 0.000393 * T) * Math.sin(M * dr) + 0.0021 * Math.sin(2 * dr * M);
+  C1 = C1 - 0.4068 * Math.sin(Mpr * dr) + 0.0161 * Math.sin(dr * 2 * Mpr);
+  C1 = C1 - 0.0004 * Math.sin(dr * 3 * Mpr);
+  C1 = C1 + 0.0104 * Math.sin(dr * 2 * F) - 0.0051 * Math.sin(dr * (M + Mpr));
+  C1 = C1 - 0.0074 * Math.sin(dr * (M - Mpr)) + 0.0004 * Math.sin(dr * (2 * F + M));
+  C1 = C1 - 0.0004 * Math.sin(dr * (2 * F - M)) - 0.0006 * Math.sin(dr * (2 * F + Mpr));
+  C1 = C1 + 0.0010 * Math.sin(dr * (2 * F - Mpr)) + 0.0005 * Math.sin(dr * (2 * Mpr + M));
+  var deltat = T < -11 ? 0.001 + 0.000839 * T + 0.0002261 * T2 - 0.00000845 * T3 - 0.000000081 * T * T3
+                       : -0.000278 + 0.000265 * T + 0.000262 * T2;
+  return INT(Jd1 + C1 - deltat + 0.5 + tz / 24);
+}
+function getSunLongitude(jdn, tz){
+  var T = (jdn - 2451545.5 - tz / 24) / 36525, T2 = T * T, dr = PI / 180;
+  var M = 357.52910 + 35999.05030 * T - 0.0001559 * T2 - 0.00000048 * T * T2;
+  var L0 = 280.46645 + 36000.76983 * T + 0.0003032 * T2;
+  var DL = (1.914600 - 0.004817 * T - 0.000014 * T2) * Math.sin(dr * M);
+  DL = DL + (0.019993 - 0.000101 * T) * Math.sin(dr * 2 * M) + 0.000290 * Math.sin(dr * 3 * M);
+  var L = (L0 + DL) * dr;
+  L = L - PI * 2 * INT(L / (PI * 2));
+  return INT(L / PI * 6);
+}
+function getLunarMonth11(yy, tz){
+  var off = jdFromDate(31, 12, yy) - 2415021, k = INT(off / 29.530588853);
+  var nm = getNewMoonDay(k, tz);
+  if (getSunLongitude(nm, tz) >= 9) nm = getNewMoonDay(k - 1, tz);
+  return nm;
+}
+function getLeapMonthOffset(a11, tz){
+  var k = INT((a11 - 2415021.076998695) / 29.530588853 + 0.5), last, i = 1;
+  var arc = getSunLongitude(getNewMoonDay(k + i, tz), tz);
+  do { last = arc; i++; arc = getSunLongitude(getNewMoonDay(k + i, tz), tz); } while (arc != last && i < 14);
+  return i - 1;
+}
+function solar2lunar(dd, mm, yy, tz){
+  tz = tz == null ? 7 : tz;
+  var dayNumber = jdFromDate(dd, mm, yy), k = INT((dayNumber - 2415021.076998695) / 29.530588853);
+  var monthStart = getNewMoonDay(k + 1, tz);
+  if (monthStart > dayNumber) monthStart = getNewMoonDay(k, tz);
+  var a11 = getLunarMonth11(yy, tz), b11 = a11, lunarYear;
+  if (a11 >= monthStart){ lunarYear = yy; a11 = getLunarMonth11(yy - 1, tz); }
+  else { lunarYear = yy + 1; b11 = getLunarMonth11(yy + 1, tz); }
+  var lunarDay = dayNumber - monthStart + 1, diff = INT((monthStart - a11) / 29), lunarLeap = 0, lunarMonth = diff + 11;
+  if (b11 - a11 > 365){
+    var leapDiff = getLeapMonthOffset(a11, tz);
+    if (diff >= leapDiff){ lunarMonth = diff + 10; if (diff == leapDiff) lunarLeap = 1; }
+  }
+  if (lunarMonth > 12) lunarMonth -= 12;
+  if (lunarMonth >= 11 && diff < 4) lunarYear -= 1;
+  return { day: lunarDay, month: lunarMonth, year: lunarYear, leap: lunarLeap };
+}
+
+/* ---------------- Dữ liệu nền ---------------- */
+var CAN = ['Giáp','Ất','Bính','Đinh','Mậu','Kỷ','Canh','Tân','Nhâm','Quý'];
+var CHI = ['Tý','Sửu','Dần','Mão','Thìn','Tỵ','Ngọ','Mùi','Thân','Dậu','Tuất','Hợi'];
+var CUNG = ['Mệnh','Phụ Mẫu','Phúc Đức','Điền Trạch','Quan Lộc','Nô Bộc','Thiên Di','Tật Ách','Tài Bạch','Tử Tức','Phu Thê','Huynh Đệ'];
+var HANH_NAME = {kim:'Kim', moc:'Mộc', thuy:'Thủy', hoa:'Hỏa', tho:'Thổ'};
+var NAP_AM = ['Hải Trung Kim','Lư Trung Hỏa','Đại Lâm Mộc','Lộ Bàng Thổ','Kiếm Phong Kim','Sơn Đầu Hỏa','Giản Hạ Thủy','Thành Đầu Thổ','Bạch Lạp Kim','Dương Liễu Mộc',
+  'Tuyền Trung Thủy','Ốc Thượng Thổ','Tích Lịch Hỏa','Tùng Bách Mộc','Trường Lưu Thủy','Sa Trung Kim','Sơn Hạ Hỏa','Bình Địa Mộc','Bích Thượng Thổ','Kim Bạch Kim',
+  'Phú Đăng Hỏa','Thiên Hà Thủy','Đại Trạch Thổ','Thoa Xuyến Kim','Tang Đố Mộc','Đại Khê Thủy','Sa Trung Thổ','Thiên Thượng Hỏa','Thạch Lựu Mộc','Đại Hải Thủy'];
+var CHI_HANH = ['thuy','tho','moc','moc','tho','hoa','hoa','tho','kim','kim','tho','thuy'];
+function napAm(can, chi){
+  var cv = INT(can / 2) + 1, chv = [0,0,1,1,2,2,0,0,1,1,2,2][chi], s = cv + chv;
+  if (s > 5) s -= 5;
+  var hanh = ['', 'kim', 'thuy', 'hoa', 'tho', 'moc'][s];
+  var k = 0; for (var i = 0; i < 60; i++){ if (i % 10 == can && i % 12 == chi){ k = i; break; } }
+  return { hanh: hanh, name: NAP_AM[INT(k / 2)] };
+}
+var CUC_NUM = {thuy:2, moc:3, kim:4, tho:5, hoa:6};
+var CUC_NAME = {2:'Thủy Nhị Cục', 3:'Mộc Tam Cục', 4:'Kim Tứ Cục', 5:'Thổ Ngũ Cục', 6:'Hỏa Lục Cục'};
+
+/* Chính tinh: ngũ hành + bảng độ sáng theo Tý..Hợi (M V D B H). Các phái có khác biệt nhỏ. */
+var MAIN = {
+  'Tử Vi':     {h:'tho',  br:'BDMBVMMDMBVB'},
+  'Thiên Cơ':  {h:'moc',  br:'DDHMMVDDVMMH'},
+  'Thái Dương':{h:'hoa',  br:'HDVVVMMDHHHH'},
+  'Vũ Khúc':   {h:'kim',  br:'VMVDMHVMVDMH'},
+  'Thiên Đồng':{h:'thuy', br:'VHMDHDHHMHHD'},
+  'Liêm Trinh':{h:'hoa',  br:'VDVHMHVDVHMH'},
+  'Thiên Phủ': {h:'tho',  br:'MBMBVDMDMBVD'},
+  'Thái Âm':   {h:'thuy', br:'VDHHHHHDVMMM'},
+  'Tham Lang': {h:'thuy', br:'HMDHVHHMDHVH'},
+  'Cự Môn':    {h:'thuy', br:'VHVMHHVHDMHD'},
+  'Thiên Tướng':{h:'thuy',br:'VDMHVDVDMHVD'},
+  'Thiên Lương':{h:'moc', br:'VDVVMHMDVHMH'},
+  'Thất Sát':  {h:'kim',  br:'MDMHHVMDMHHV'},
+  'Phá Quân':  {h:'thuy', br:'MVHHDHMVHHDH'}
+};
+var BR_NAME = {M:'Miếu', V:'Vượng', D:'Đắc', B:'Bình', H:'Hãm'};
+var BR_SHORT = {M:'M', V:'V', D:'Đ', B:'B', H:'H'};
+/* Tứ hóa theo can năm: [Lộc, Quyền, Khoa, Kỵ] */
+var TU_HOA = [
+  ['Liêm Trinh','Phá Quân','Vũ Khúc','Thái Dương'],
+  ['Thiên Cơ','Thiên Lương','Tử Vi','Thái Âm'],
+  ['Thiên Đồng','Thiên Cơ','Văn Xương','Liêm Trinh'],
+  ['Thái Âm','Thiên Đồng','Thiên Cơ','Cự Môn'],
+  ['Tham Lang','Thái Âm','Hữu Bật','Thiên Cơ'],
+  ['Vũ Khúc','Tham Lang','Thiên Lương','Văn Khúc'],
+  ['Thái Dương','Vũ Khúc','Thái Âm','Thiên Đồng'],
+  ['Cự Môn','Thái Dương','Văn Khúc','Văn Xương'],
+  ['Thiên Lương','Tử Vi','Tả Phù','Vũ Khúc'],
+  ['Phá Quân','Cự Môn','Thái Âm','Tham Lang']
+];
+var HOA_TAG = [['L','Lộc'],['Q','Quyền'],['K','Khoa'],['Ky','Kỵ']];
+var MINOR_TYPE = {
+  'Tả Phù':'g','Hữu Bật':'g','Văn Xương':'g','Văn Khúc':'g','Thiên Khôi':'g','Thiên Việt':'g','Lộc Tồn':'g','Thiên Mã':'g',
+  'Hồng Loan':'g','Thiên Hỷ':'g','Long Trì':'g','Phượng Các':'g','Ân Quang':'g','Thiên Quý':'g',
+  'Kình Dương':'b','Đà La':'b','Hỏa Tinh':'b','Linh Tinh':'b','Địa Không':'b','Địa Kiếp':'b','Thiên Hình':'b','Thiên Khốc':'b','Thiên Hư':'b',
+  'Đào Hoa':'n','Thiên Diêu':'n'
+};
+var BACSI = ['Bác Sĩ','Lực Sĩ','Thanh Long','Tiểu Hao','Tướng Quân','Tấu Thư','Phi Liêm','Hỷ Thần','Bệnh Phù','Đại Hao','Phục Binh','Quan Phủ'];
+var THAITUE = ['Thái Tuế','Thiếu Dương','Tang Môn','Thiếu Âm','Quan Phù','Tử Phù','Tuế Phá','Long Đức','Bạch Hổ','Phúc Đức','Điếu Khách','Trực Phù'];
+var TRANGSINH = ['Tràng Sinh','Mộc Dục','Quan Đới','Lâm Quan','Đế Vượng','Suy','Bệnh','Tử','Mộ','Tuyệt','Thai','Dưỡng'];
+
+/* ---------------- AN SAO ---------------- */
+function buildChart(inp){
+  // inp: {name, sex(1 nam/0 nữ), y,m,d, hh, mi, lateTy, viewYear}
+  var y = inp.y, m = inp.m, d = inp.d;
+  if (inp.lateTy && inp.hh >= 23){ var dt = new Date(Date.UTC(y, m - 1, d + 1)); y = dt.getUTCFullYear(); m = dt.getUTCMonth() + 1; d = dt.getUTCDate(); }
+  var L = solar2lunar(d, m, y, 7);
+  var hour = INT((inp.hh + 1) / 2) % 12;           // chi giờ
+  var lm = L.month; if (L.leap && L.day > 15) lm = lm % 12 + 1; // tháng nhuận nửa sau tính tháng sau
+  var yCan = mod(L.year + 6, 10), yChi = mod(L.year + 8, 12);
+  var duong = yCan % 2 == 0, nam = inp.sex == 1;
+  var thuan = (duong && nam) || (!duong && !nam);
+  var dir = thuan ? 1 : -1;
+
+  var cells = []; for (var i = 0; i < 12; i++) cells.push({chi:i, main:[], minor:[], ring:[], hoa:{}});
+  function add(pos, name, kind){ pos = mod(pos, 12); (kind == 'main' ? cells[pos].main : kind == 'ring' ? cells[pos].ring : cells[pos].minor).push(name); return pos; }
+
+  var menh = mod(2 + (lm - 1) - hour, 12), than = mod(2 + (lm - 1) + hour, 12);
+  for (var c = 0; c < 12; c++) cells[mod(menh + c, 12)].cung = CUNG[c];
+  var canDan = mod((yCan % 5) * 2 + 2, 10);
+  for (c = 0; c < 12; c++) cells[c].can = mod(canDan + mod(c - 2, 12), 10);
+
+  var na = napAm(cells[menh].can, menh), cuc = CUC_NUM[na.hanh];
+  var banMenh = napAm(yCan, yChi);
+
+  // Tử Vi
+  var dd = L.day, q = Math.ceil(dd / cuc), x = q * cuc - dd;
+  var tuvi = mod(2 + q - 1 + (x % 2 == 0 ? x : -x), 12);
+  var pos = {};
+  pos['Tử Vi'] = tuvi; pos['Thiên Cơ'] = mod(tuvi - 1, 12); pos['Thái Dương'] = mod(tuvi - 3, 12);
+  pos['Vũ Khúc'] = mod(tuvi - 4, 12); pos['Thiên Đồng'] = mod(tuvi - 5, 12); pos['Liêm Trinh'] = mod(tuvi - 8, 12);
+  var phu = mod(4 - tuvi, 12);
+  pos['Thiên Phủ'] = phu; pos['Thái Âm'] = mod(phu + 1, 12); pos['Tham Lang'] = mod(phu + 2, 12); pos['Cự Môn'] = mod(phu + 3, 12);
+  pos['Thiên Tướng'] = mod(phu + 4, 12); pos['Thiên Lương'] = mod(phu + 5, 12); pos['Thất Sát'] = mod(phu + 6, 12); pos['Phá Quân'] = mod(phu + 10, 12);
+  Object.keys(MAIN).forEach(function(s){ add(pos[s], s, 'main'); });
+
+  // Phụ tinh
+  var mp = {};
+  var LT = [2,3,5,6,5,6,8,9,11,0][yCan];
+  mp['Lộc Tồn'] = LT; mp['Kình Dương'] = LT + 1; mp['Đà La'] = LT - 1;
+  mp['Thiên Khôi'] = [1,0,11,11,1,0,6,6,3,3][yCan]; mp['Thiên Việt'] = [7,8,9,9,7,8,2,2,5,5][yCan];
+  mp['Văn Xương'] = 10 - hour; mp['Văn Khúc'] = 4 + hour;
+  mp['Tả Phù'] = 4 + (lm - 1); mp['Hữu Bật'] = 10 - (lm - 1);
+  mp['Địa Không'] = 11 - hour; mp['Địa Kiếp'] = 11 + hour;
+  var g = yChi % 4; // 0: Thân Tý Thìn, 1: Tỵ Dậu Sửu, 2: Dần Ngọ Tuất, 3: Hợi Mão Mùi
+  mp['Thiên Mã'] = [2, 11, 8, 5][g];
+  mp['Đào Hoa'] = [9, 6, 3, 0][g];
+  mp['Hồng Loan'] = 3 - yChi; mp['Thiên Hỷ'] = 9 - yChi;
+  mp['Thiên Khốc'] = 6 - yChi; mp['Thiên Hư'] = 6 + yChi;
+  mp['Long Trì'] = 4 + yChi; mp['Phượng Các'] = 10 - yChi;
+  mp['Thiên Hình'] = 9 + (lm - 1); mp['Thiên Diêu'] = 1 + (lm - 1);
+  var hoaStart = [2, 3, 1, 9][g], linhStart = [10, 10, 3, 10][g];
+  mp['Hỏa Tinh'] = hoaStart + dir * hour; mp['Linh Tinh'] = linhStart - dir * hour;
+  Object.keys(mp).forEach(function(s){ mp[s] = add(mp[s], s, 'minor'); });
+  Object.keys(pos).forEach(function(s){ mp[s] = pos[s]; });
+
+  // Vòng Bác Sĩ, Thái Tuế, Tràng Sinh
+  for (i = 0; i < 12; i++){ cells[mod(LT + dir * i, 12)].bacsi = BACSI[i]; cells[mod(yChi + i, 12)].thaitue = THAITUE[i]; }
+  var tsStart = {thuy:8, tho:8, moc:11, kim:5, hoa:2}[na.hanh];
+  for (i = 0; i < 12; i++) cells[mod(tsStart + dir * i, 12)].trangsinh = TRANGSINH[i];
+
+  // Tứ hóa
+  var hoaList = TU_HOA[yCan];
+  hoaList.forEach(function(s, k){ var p = mp[s]; if (p != null) cells[p].hoa[s] = HOA_TAG[k]; });
+
+  // Đại hạn
+  for (i = 0; i < 12; i++){ var p2 = mod(menh + dir * i, 12); cells[p2].dh = cuc + 10 * i; }
+
+  // Tuần – Triệt
+  var trietPair = [[8,9],[6,7],[4,5],[2,3],[0,1]][yCan % 5];
+  var start = mod(yChi - yCan, 12), tuanPair = [mod(start + 10, 12), mod(start + 11, 12)];
+
+  var viewYear = inp.viewYear || new Date().getFullYear();
+  var age = viewYear - L.year + 1;
+  var curDH = null;
+  for (i = 0; i < 12; i++){ if (age >= cells[i].dh && age <= cells[i].dh + 9) curDH = i; }
+  var lnChi = mod(viewYear + 8, 12);
+
+  var chart = {
+    input: inp, lunar: L, lunarMonthUsed: lm, hour: hour, yCan: yCan, yChi: yChi, duong: duong, nam: nam, thuan: thuan,
+    menh: menh, than: than, cuc: cuc, cucName: CUC_NAME[cuc], banMenh: banMenh, menhNapAm: na,
+    cells: cells, pos: mp, hoaList: hoaList, triet: trietPair, tuan: tuanPair,
+    viewYear: viewYear, age: age, curDH: curDH, lnChi: lnChi
+  };
+  chart.cachCuc = detectCachCuc(chart);
+  return chart;
+}
+function brightness(star, chi){ var t = MAIN[star]; return t ? t.br[chi] : null; }
+
+/* ---------------- CÁCH CỤC ---------------- */
+function detectCachCuc(ch){
+  var M = ch.menh, P = ch.pos, out = [];
+  var tp = [M, mod(M + 4, 12), mod(M + 8, 12), mod(M + 6, 12)];
+  function at(s){ return P[s]; }
+  function inMenh(s){ return P[s] === M; }
+  function inTP(s){ return tp.indexOf(P[s]) >= 0; }
+  function giap(a, b){ var l = mod(M - 1, 12), r = mod(M + 1, 12); return (P[a] === l && P[b] === r) || (P[a] === r && P[b] === l); }
+  function bright(s){ var b = brightness(s, P[s]); return b === 'M' || b === 'V' || b === 'D'; }
+  function push(name, kind, desc){ out.push({name:name, kind:kind, desc:desc}); }
+  var mainMenh = ch.cells[M].main;
+
+  if (inMenh('Tử Vi') && inMenh('Thiên Phủ')) push('Tử Phủ đồng cung','good','Hai đế tinh cùng tọa Mệnh: phong thái đĩnh đạc, có khả năng lãnh đạo, giữ của tốt.');
+  else if (inTP('Tử Vi') && inTP('Thiên Phủ')) push('Tử Phủ triều viên','good','Tử Vi và Thiên Phủ chiếu về Mệnh: được nâng đỡ, dễ có địa vị và nền tảng vững.');
+  if (['Thất Sát','Phá Quân','Tham Lang'].some(inMenh)) push('Sát Phá Tham','mid','Bộ sao mạnh, ưa thay đổi, dám nghĩ dám làm; thành bại lớn tùy cát hung tinh đi kèm.');
+  var cnd = ['Thiên Cơ','Thái Âm','Thiên Đồng','Thiên Lương'].filter(inTP).length;
+  if (cnd >= 3 && !['Tử Vi','Thất Sát','Phá Quân','Tham Lang'].some(inMenh)) push('Cơ Nguyệt Đồng Lương','good','Hợp nghề chuyên môn, tham mưu, hành chính, tài chính – ổn định, cẩn trọng, giỏi tổ chức.');
+  if (inTP('Thái Dương') && inTP('Thái Âm')){
+    if (bright('Thái Dương') && bright('Thái Âm')) push('Nhật Nguyệt tịnh minh','good','Mặt trời và mặt trăng đều sáng: thông minh, danh tiếng tốt, được quý nhân giúp.');
+    else if (!bright('Thái Dương') && !bright('Thái Âm')) push('Nhật Nguyệt phản bối','bad','Nhật Nguyệt cùng hãm: phải tự lực nhiều, nên làm việc kín đáo, tránh phô trương.');
+  }
+  if (inMenh('Tả Phù') && inMenh('Hữu Bật')) push('Tả Hữu đồng cung','good','Được nhiều người trợ giúp, giỏi kết nối và quy tụ nhân lực.');
+  else if (giap('Tả Phù','Hữu Bật')) push('Tả Hữu giáp Mệnh','good','Hai trợ tinh kẹp Mệnh: luôn có người hỗ trợ đúng lúc.');
+  if (giap('Văn Xương','Văn Khúc') || (inTP('Văn Xương') && inTP('Văn Khúc'))) push('Xương Khúc hội Mệnh','good','Văn chương, học vấn, thi cử thuận lợi; ăn nói có duyên.');
+  if (inTP('Thiên Khôi') && inTP('Thiên Việt')) push('Khôi Việt (tọa quý hướng quý)','good','Hay gặp quý nhân, có cơ hội thăng tiến qua người có vị thế.');
+  var nHoa = [0,1,2].filter(function(k){ return tp.indexOf(P[ch.hoaList[k]]) >= 0; }).length;
+  if (nHoa == 3) push('Tam Hóa liên châu','good','Lộc – Quyền – Khoa cùng hội Mệnh: tài, quyền, danh đều có cơ hội phát triển.');
+  var hoaLocPos = P[ch.hoaList[0]];
+  if (tp.indexOf(P['Thiên Mã']) >= 0 && (P['Thiên Mã'] === P['Lộc Tồn'] || P['Thiên Mã'] === hoaLocPos)) push('Lộc Mã giao trì','good','Tài lộc đến nhờ di chuyển, kinh doanh, giao thương – càng năng động càng có lợi.');
+  if (inTP('Lộc Tồn') && tp.indexOf(hoaLocPos) >= 0) push('Song Lộc','good','Lộc Tồn và Hóa Lộc cùng hội: nguồn tài chính đa dạng, tích lũy tốt.');
+  if (mainMenh.length == 0) push('Mệnh vô chính diệu','mid','Mệnh không có chính tinh: mượn sao cung Thiên Di để luận; tính linh hoạt, chịu ảnh hưởng môi trường.');
+  if (giap('Kình Dương','Đà La')) push('Kình Đà giáp Mệnh','bad','Dễ gặp áp lực, cạnh tranh từ hai phía; cần kiên nhẫn và giữ sức khỏe.');
+  if (inMenh('Địa Không') || inMenh('Địa Kiếp') || giap('Địa Không','Địa Kiếp')) push('Không Kiếp chiếu Mệnh','bad','Nên tránh đầu cơ mạo hiểm; hợp nghề sáng tạo, kỹ thuật, tâm linh, tư duy khác biệt.');
+  if (inTP('Tham Lang') && (P['Hỏa Tinh'] === P['Tham Lang'] || P['Linh Tinh'] === P['Tham Lang'])) push('Hỏa/Linh Tham','good','Cách bạo phát: có cơ hội thành công nhanh, cần biết giữ thành quả.');
+  if (P[ch.hoaList[3]] === M) push('Hóa Kỵ tọa Mệnh','bad','Hay suy nghĩ, dễ vướng thị phi; làm việc kỹ lưỡng sẽ biến bất lợi thành chuyên sâu.');
+  if (inMenh('Tham Lang') && inMenh('Vũ Khúc')) push('Tham Vũ đồng hành','good','Tiền vận vất vả, hậu vận phát đạt – càng về sau càng vững tài chính.');
+  if (inMenh('Cự Môn') && inMenh('Thái Dương') && M === 2) push('Cự Nhật đồng cung tại Dần','good','Ăn nói có sức thuyết phục, danh tiếng lan rộng, hợp ngoại giao – giảng dạy – truyền thông.');
+  if (inMenh('Kình Dương') && M === 6) push('Mã đầu đới kiếm','mid','Kình Dương ở Ngọ: uy lực mạnh, hợp võ nghiệp / quản trị rủi ro, cần tiết chế nóng nảy.');
+  return out;
+}
+
+/* ---------------- Ý NGHĨA SAO & CUNG ---------------- */
+var STAR_INFO = {
+  'Tử Vi':'Đế tinh, chủ về quyền uy, tự trọng và khả năng lãnh đạo. Sáng thì đĩnh đạc, được kính nể; hãm thì dễ cô độc, cố chấp. Cần Tả Hữu, Khôi Việt phò trợ mới phát huy trọn vẹn.',
+  'Thiên Cơ':'Sao của trí tuệ và mưu lược: nhanh nhạy, giỏi phân tích, thích thay đổi. Hợp nghề kỹ thuật, tham mưu, kế hoạch. Hãm thì hay lo nghĩ, khó ổn định.',
+  'Thái Dương':'Mặt trời – chủ danh tiếng, sự cho đi, tính quang minh. Sáng (ban ngày) thì nổi tiếng, rộng lượng; hãm thì vất vả, ít được ghi nhận. Còn đại diện cha, chồng, con trai.',
+  'Vũ Khúc':'Tài tinh: quyết đoán, thực tế, giỏi quản lý tiền. Hợp tài chính, kinh doanh, kỹ thuật cơ khí. Tính cứng rắn, ít nói, cần học mềm mỏng trong quan hệ.',
+  'Thiên Đồng':'Phúc tinh: hiền hòa, lạc quan, biết hưởng thụ, giỏi hòa giải. Thường tiền vận vất vả hậu vận an nhàn. Cần động lực để không bị trì hoãn.',
+  'Liêm Trinh':'Sao của nguyên tắc và tham vọng: thẳng thắn, cương nghị, có tài tổ chức. Sáng thì liêm chính, hợp hành chính – pháp luật; hãm thì nóng nảy, dễ thị phi.',
+  'Thiên Phủ':'Kho tàng – chủ giữ của, ổn định, rộng lượng. Người có Phủ thường điềm đạm, giỏi quản lý tài sản và con người, hợp vai trò quản lý, kế toán, ngân hàng.',
+  'Thái Âm':'Mặt trăng – chủ điền sản, sự tinh tế, cảm xúc. Sáng (ban đêm) thì giàu có, nhã nhặn, giỏi tích lũy; hãm thì đa sầu. Còn đại diện mẹ, vợ, con gái.',
+  'Tham Lang':'Sao của ham muốn và tài giao tế: đa tài, đa nghệ, khéo léo, ưa náo nhiệt. Sáng thì phát đạt nhờ quan hệ; hãm thì dễ sa đà. Gặp Hỏa/Linh có thể bạo phát.',
+  'Cự Môn':'Ám tinh – chủ ngôn ngữ, tranh biện, chiều sâu. Sáng thì ăn nói thuyết phục, hợp luật sư, giảng dạy, truyền thông; hãm thì dễ thị phi, hiểu lầm.',
+  'Thiên Tướng':'Ấn tinh: chính trực, trọng nghĩa, chu đáo, giỏi phò tá. Hợp vai trò quản lý trung gian, nhân sự, dịch vụ. Gặp Hóa Kỵ/Kình Đà kẹp thì nên thận trọng hợp đồng.',
+  'Thiên Lương':'Ấm tinh – chủ che chở, phúc thọ, tính thanh cao. Thích giúp người, có khiếu y dược, giáo dục, tư vấn. Hay gặp nạn rồi được giải.',
+  'Thất Sát':'Tướng tinh: dũng mãnh, độc lập, dám chấp nhận rủi ro. Sáng thì lập nghiệp lớn, quyền biến; hãm thì vất vả, nóng vội. Hợp kinh doanh, quân sự, khởi nghiệp.',
+  'Phá Quân':'Hao tinh – chủ phá cũ lập mới, tiên phong, đổi mới. Cuộc đời nhiều thay đổi lớn; sáng thì làm nên chuyện, hãm thì hao tán. Hợp nghề sáng tạo, kỹ thuật, cải tổ.',
+  'Tả Phù':'Trợ tinh: được giúp đỡ, có người phò tá, tính hòa nhã.','Hữu Bật':'Trợ tinh: quý nhân âm thầm, khéo léo, giỏi phối hợp.',
+  'Văn Xương':'Văn tinh: học vấn, thi cử, giấy tờ chính thống.','Văn Khúc':'Văn tinh: tài ăn nói, nghệ thuật, năng khiếu mềm.',
+  'Thiên Khôi':'Quý nhân dương: người trên nâng đỡ, cơ hội công khai.','Thiên Việt':'Quý nhân âm: giúp đỡ kín đáo, cơ hội bất ngờ.',
+  'Lộc Tồn':'Tài lộc bền vững, tích lũy; tính tiết kiệm, ổn định.','Thiên Mã':'Di chuyển, thay đổi, năng động – gặp Lộc thì tài đến từ xa.',
+  'Kình Dương':'Sát tinh dương kim: cạnh tranh, quyết liệt, dao kéo – sáng thì thành uy.','Đà La':'Sát tinh âm kim: trì hoãn, vướng mắc, cần kiên nhẫn.',
+  'Hỏa Tinh':'Sát tinh: nóng nảy, đột ngột, bộc phát.','Linh Tinh':'Sát tinh: âm thầm, bất ngờ, hay lo lắng.',
+  'Địa Không':'Không vong: ý tưởng khác thường, dễ hao mất nếu mạo hiểm.','Địa Kiếp':'Kiếp sát: biến động tài chính, hợp nghề sáng tạo.',
+  'Hồng Loan':'Duyên tình, hỷ sự, nét duyên dáng.','Thiên Hỷ':'Tin vui, hỷ sự, sinh nở.','Đào Hoa':'Sức hút, giao tế, tình cảm lãng mạn.',
+  'Thiên Hình':'Kỷ luật, pháp lý, phẫu thuật; hợp ngành luật, y, quân đội.','Thiên Diêu':'Lãng mạn, nghệ thuật, dễ sa vào hưởng thụ.',
+  'Thiên Khốc':'Buồn phiền, lo âu; đi cùng tài năng thì thành giọng hay, cảm xúc sâu.','Thiên Hư':'Hư hao, trống trải; nhắc giữ sức khỏe tinh thần.',
+  'Long Trì':'Tài năng nghệ thuật, kiến trúc, may mắn nhỏ.','Phượng Các':'Danh dự, phong cách, thẩm mỹ.'
+};
+var CUNG_INFO = {
+  'Mệnh':'Bản chất, tính cách, năng lực bẩm sinh và hướng đi chính của đời người.',
+  'Phụ Mẫu':'Quan hệ với cha mẹ, cấp trên, giấy tờ – học vấn.',
+  'Phúc Đức':'Phúc phần dòng họ, đời sống tinh thần, sự an vui nội tâm và tuổi thọ.',
+  'Điền Trạch':'Nhà cửa, đất đai, tài sản cố định, môi trường sống.',
+  'Quan Lộc':'Sự nghiệp, nghề nghiệp, công danh, cách làm việc.',
+  'Nô Bộc':'Bạn bè, đồng nghiệp, cấp dưới, khách hàng, quan hệ xã hội.',
+  'Thiên Di':'Ra ngoài, đi xa, môi trường bên ngoài, cách người khác nhìn mình.',
+  'Tật Ách':'Sức khỏe, bệnh tật, tai ách cần đề phòng.',
+  'Tài Bạch':'Tiền bạc, cách kiếm và tiêu tiền, khả năng tích lũy.',
+  'Tử Tức':'Con cái, học trò, sự sáng tạo, khả năng sinh sản.',
+  'Phu Thê':'Vợ chồng, người yêu, đối tác hôn nhân.',
+  'Huynh Đệ':'Anh chị em, bạn thân, cộng sự ngang hàng.'
+};
+
+/* ---------------- VẼ LÁ SỐ ---------------- */
+var GRID = {5:[1,1],6:[1,2],7:[1,3],8:[1,4],4:[2,1],9:[2,4],3:[3,1],10:[3,4],2:[4,1],1:[4,2],0:[4,3],11:[4,4]};
+var CH = null, CHAT = [];
+function hanhCls(h){ return h == 'hoa' ? 'hoa-c' : h; }
+function renderChart(ch){
+  var el = $('chart'); el.innerHTML = '';
+  for (var i = 0; i < 12; i++){
+    var c = ch.cells[i], d = document.createElement('div');
+    d.className = 'cell' + (i == ch.menh ? ' menh' : '');
+    d.style.gridRow = GRID[i][0]; d.style.gridColumn = GRID[i][1]; d.dataset.chi = i;
+    var h = '<div class="ctop"><span>' + CAN[c.can] + ' ' + CHI[i] + '</span><span>' + (c.trangsinh || '') + '</span></div>';
+    h += '<div class="cname">' + c.cung.toUpperCase() + (i == ch.than ? '<span class="than">THÂN</span>' : '') + '</div>';
+    if (!c.main.length) h += '<span class="mstar muted" style="font-size:11.5px">(vô chính diệu)</span>';
+    c.main.forEach(function(s){
+      var b = brightness(s, i), hz = c.hoa[s];
+      h += '<span class="mstar ' + hanhCls(MAIN[s].h) + '" data-star="' + s + '">' + s.toUpperCase() + ' <span class="br">(' + BR_SHORT[b] + ')</span>' +
+           (hz ? '<span class="hoa ' + hz[0] + '">' + hz[1] + '</span>' : '') + '</span>';
+    });
+    h += '<div class="minors">';
+    c.minor.forEach(function(s){
+      var hz = c.hoa[s];
+      h += '<span class="' + (MINOR_TYPE[s] || 'n') + '" data-star="' + s + '">' + s + (hz ? '<span class="hoa ' + hz[0] + '">' + hz[1] + '</span>' : '') + '</span>';
+    });
+    h += '</div><div class="ring">' + [c.bacsi, c.thaitue].filter(Boolean).join(' · ') + '</div>';
+    h += '<div class="cbot"><span>ĐH <b>' + c.dh + '</b>–' + (c.dh + 9) + '</span><span>' + (i == ch.curDH ? '<b style="color:var(--gold)">◆ Đại hạn hiện tại</b>' : '') + '</span></div>';
+    if (ch.tuan.indexOf(i) >= 0) h += '<span class="tt">TUẦN</span>';
+    if (ch.triet.indexOf(i) >= 0) h += '<span class="tt triet">TRIỆT</span>';
+    if (i == ch.lnChi) h += '<span class="ln">LN ' + ch.viewYear + '</span>';
+    d.innerHTML = h; el.appendChild(d);
+  }
+  var L = ch.lunar, inp = ch.input, ctr = document.createElement('div'); ctr.className = 'center';
+  ctr.innerHTML = '<div class="nm">' + esc(inp.name || 'Lá số Tử Vi') + '</div><div class="muted">HUYỀN · TỬ VI AI — IDECO</div><table>' +
+    '<tr><td>Dương lịch</td><td>' + pad(inp.d) + '/' + pad(inp.m) + '/' + inp.y + ' — ' + pad(inp.hh) + ':' + pad(inp.mi) + '</td></tr>' +
+    '<tr><td>Âm lịch</td><td>' + L.day + '/' + L.month + (L.leap ? ' (nhuận)' : '') + ' năm ' + CAN[ch.yCan] + ' ' + CHI[ch.yChi] + ' — giờ ' + CHI[ch.hour] + '</td></tr>' +
+    '<tr><td>Âm dương</td><td>' + (ch.duong ? 'Dương' : 'Âm') + ' ' + (ch.nam ? 'Nam' : 'Nữ') + ' — ' + (ch.thuan ? 'thuận lý (đi thuận)' : 'nghịch lý (đi nghịch)') + '</td></tr>' +
+    '<tr><td>Bản mệnh</td><td class="' + hanhCls(ch.banMenh.hanh) + '"><b>' + ch.banMenh.name + '</b></td></tr>' +
+    '<tr><td>Cục</td><td class="' + hanhCls(ch.menhNapAm.hanh) + '"><b>' + ch.cucName + '</b></td></tr>' +
+    '<tr><td>Mệnh / Thân</td><td>Mệnh tại ' + CHI[ch.menh] + ' · Thân cư ' + ch.cells[ch.than].cung + '</td></tr>' +
+    '<tr><td>Năm xem</td><td>' + ch.viewYear + ' (' + CAN[mod(ch.viewYear + 6, 10)] + ' ' + CHI[ch.lnChi] + ') · ' + ch.age + ' tuổi âm</td></tr>' +
+    '</table>';
+  el.appendChild(ctr);
+  $('chartArea').style.display = 'block';
+  // cách cục
+  var cc = $('ccList');
+  cc.innerHTML = ch.cachCuc.length ? ch.cachCuc.map(function(x){
+    var t = {good:'Cát', bad:'Cần lưu ý', mid:'Trung tính'}[x.kind];
+    return '<div class="ccitem ' + x.kind + '"><b>' + x.name + '<span class="tag ' + x.kind + '">' + t + '</span></b><span class="muted">' + x.desc + '</span></div>';
+  }).join('') : '<p class="muted">Không phát hiện cách cục điển hình — lá số cân bằng, hãy xem luận giải chi tiết từng cung.</p>';
+}
+function pad(n){ return (n < 10 ? '0' : '') + n; }
+
+$('chart').addEventListener('click', function(e){
+  var st = e.target.closest('[data-star]');
+  if (st){ e.stopPropagation(); showStar(st.dataset.star); return; }
+  var cell = e.target.closest('.cell'); if (!cell || !CH) return;
+  selectCung(+cell.dataset.chi);
+});
+function selectCung(i){
+  var tp = [i, mod(i + 4, 12), mod(i + 8, 12), mod(i + 6, 12)];
+  document.querySelectorAll('.cell').forEach(function(el){
+    var k = +el.dataset.chi; el.classList.toggle('sel', k == i); el.classList.toggle('tp', tp.indexOf(k) >= 0 && k != i);
+  });
+  var c = CH.cells[i], box = $('cungDetail');
+  var stars = c.main.map(function(s){ return s + ' (' + BR_NAME[brightness(s, i)] + ')' + (c.hoa[s] ? ' Hóa ' + c.hoa[s][1] : ''); });
+  box.innerHTML = '<h2>🏛 Cung ' + c.cung + ' — ' + CAN[c.can] + ' ' + CHI[i] + '</h2><p class="muted">' + CUNG_INFO[c.cung] + '</p>' +
+    '<p><b>Chính tinh:</b> ' + (stars.join(', ') || 'vô chính diệu — mượn sao cung ' + CH.cells[mod(i + 6, 12)].cung) + '</p>' +
+    '<p><b>Phụ tinh:</b> ' + (c.minor.join(', ') || '—') + '</p>' +
+    '<p><b>Tam phương tứ chính:</b> ' + tp.slice(1).map(function(k){ return CH.cells[k].cung + ' (' + CHI[k] + ')'; }).join(' · ') + '</p>' +
+    '<p><b>Đại hạn:</b> ' + c.dh + '–' + (c.dh + 9) + ' tuổi · Tràng sinh: ' + c.trangsinh + '</p>' +
+    '<button class="btn gold" onclick="askAI(\'Luận chi tiết cung ' + c.cung + ' của tôi, xét cả tam phương tứ chính.\')">🤖 Nhờ Huyền luận cung này</button>';
+  box.style.display = 'block';
+}
+function showStar(s){
+  var html = '<h2>⭐ ' + s + '</h2>';
+  if (MAIN[s]) html += '<p>Ngũ hành: <b class="' + hanhCls(MAIN[s].h) + '">' + HANH_NAME[MAIN[s].h] + '</b>' + (CH && CH.pos[s] != null ? ' · Tại ' + CHI[CH.pos[s]] + ': <b>' + BR_NAME[brightness(s, CH.pos[s])] + '</b> (cung ' + CH.cells[CH.pos[s]].cung + ')' : '') + '</p>';
+  else if (CH && CH.pos[s] != null) html += '<p>Tại ' + CHI[CH.pos[s]] + ' (cung ' + CH.cells[CH.pos[s]].cung + ')</p>';
+  html += '<p>' + (STAR_INFO[s] || 'Phụ tinh bổ trợ.') + '</p>';
+  if (CH) html += '<button class="btn gold" onclick="closeModal();askAI(\'Sao ' + s + ' ảnh hưởng thế nào trong lá số của tôi?\')">🤖 Hỏi Huyền về sao này</button>';
+  openModal(html);
+}
+function openModal(h){ $('mbody').innerHTML = h; $('modal').classList.add('on'); }
+function closeModal(){ $('modal').classList.remove('on'); }
+$('modal').addEventListener('click', function(e){ if (e.target.id == 'modal') closeModal(); });
+
+/* ---------------- FORM ---------------- */
+function readForm(p){
+  var dv = $(p + 'Date').value, tv = $(p + 'Time').value || '12:00';
+  if (!dv) return null;
+  var a = dv.split('-'), t = tv.split(':');
+  return { name: $(p + 'Name').value.trim(), sex: +$(p + 'Sex').value, y: +a[0], m: +a[1], d: +a[2], hh: +t[0], mi: +t[1],
+           lateTy: p == 'f' ? $('fLateTy').checked : true, viewYear: p == 'f' ? (+$('fView').value || new Date().getFullYear()) : new Date().getFullYear() };
+}
+$('fView').value = new Date().getFullYear();
+$('btnLap').onclick = function(){
+  var inp = readForm('f'); if (!inp){ toast('Vui lòng nhập ngày sinh'); return; }
+  if (inp.y < 1900 || inp.y > 2199){ toast('Năm sinh trong khoảng 1900–2199'); return; }
+  CH = buildChart(inp); renderChart(CH);
+  var L = CH.lunar;
+  $('lunarInfo').textContent = 'Âm lịch: ' + L.day + '/' + L.month + (L.leap ? ' nhuận' : '') + '/' + L.year + ' — ' + CAN[CH.yCan] + ' ' + CHI[CH.yChi];
+  $('cungDetail').style.display = 'none';
+  CHAT = []; $('chatbox').innerHTML = '<div class="muted">Lá số đã sẵn sàng. Chọn chủ đề hoặc hỏi tự do.</div>';
+  lsSet('last', inp);
+  setTimeout(function(){ $('chartArea').scrollIntoView({behavior:'smooth'}); }, 50);
+};
+$('btnPrint').onclick = function(){ if (!CH){ toast('Hãy lập lá số trước'); return; } window.print(); };
+$('btnSave').onclick = function(){
+  var inp = readForm('f'); if (!inp) return;
+  var list = lsGet('profiles', []);
+  list = list.filter(function(p){ return !(p.name == inp.name && p.y == inp.y && p.m == inp.m && p.d == inp.d); });
+  list.unshift(inp); lsSet('profiles', list.slice(0, 100)); lsSet('profilesAt', Date.now()); toast('Đã lưu hồ sơ'); renderProfiles(); fbPushProfiles();
+};
+function fillForm(inp){
+  $('fName').value = inp.name || ''; $('fSex').value = inp.sex; $('fDate').value = inp.y + '-' + pad(inp.m) + '-' + pad(inp.d);
+  $('fTime').value = pad(inp.hh) + ':' + pad(inp.mi);
+}
+function renderProfiles(){
+  var list = lsGet('profiles', []), el = $('profList');
+  if (!list.length){ el.innerHTML = '<p class="muted">Chưa có hồ sơ nào. Lập lá số rồi bấm 💾 Lưu hồ sơ.</p>'; return; }
+  el.innerHTML = list.map(function(p, i){
+    return '<div class="prof"><div><b>' + esc(p.name || '(không tên)') + '</b> <span class="muted">' + (p.sex ? 'Nam' : 'Nữ') + ' · ' + pad(p.d) + '/' + pad(p.m) + '/' + p.y + ' ' + pad(p.hh) + ':' + pad(p.mi) + '</span></div>' +
+      '<div class="row"><button class="btn" onclick="openProfile(' + i + ')">Mở</button><button class="btn" onclick="useHop(' + i + ',\'a\')">→ A</button><button class="btn" onclick="useHop(' + i + ',\'b\')">→ B</button><button class="btn" onclick="delProfile(' + i + ')">🗑</button></div></div>';
+  }).join('');
+}
+function openProfile(i){ fillForm(lsGet('profiles', [])[i]); go('lap'); $('btnLap').click(); }
+function delProfile(i){ if (!confirm('Xóa hồ sơ này?')) return; var l = lsGet('profiles', []); l.splice(i, 1); lsSet('profiles', l); lsSet('profilesAt', Date.now()); renderProfiles(); fbPushProfiles(); }
+function useHop(i, p){ var x = lsGet('profiles', [])[i]; $(p + 'Name').value = x.name || ''; $(p + 'Sex').value = x.sex; $(p + 'Date').value = x.y + '-' + pad(x.m) + '-' + pad(x.d); $(p + 'Time').value = pad(x.hh) + ':' + pad(x.mi); go('hop'); toast('Đã đưa vào người ' + p.toUpperCase()); }
+
+/* ---------------- ĐIỀU HƯỚNG / GIAO DIỆN ---------------- */
+function go(v){
+  document.querySelectorAll('nav button[data-v]').forEach(function(b){ b.classList.toggle('on', b.dataset.v == v); });
+  document.querySelectorAll('.view').forEach(function(s){ s.classList.toggle('on', s.id == 'v-' + v); });
+  if (v == 'hoso') renderProfiles();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+document.querySelectorAll('nav button[data-v]').forEach(function(b){ b.onclick = function(){ go(b.dataset.v); }; });
+$('btnTheme').onclick = function(){ document.body.classList.toggle('light'); lsSet('light', document.body.classList.contains('light')); };
+if (lsGet('light', false)) document.body.classList.add('light');
+
+/* ---------------- KHO KIẾN THỨC ---------------- */
+function renderKB(f){
+  f = (f || '').toLowerCase();
+  function ok(t){ return !f || t.toLowerCase().indexOf(f) >= 0; }
+  $('kbStars').innerHTML = Object.keys(MAIN).filter(function(s){ return ok(s + STAR_INFO[s]); }).map(function(s){
+    return '<div class="it"><b class="' + hanhCls(MAIN[s].h) + '">' + s + '</b> <span class="muted">· ' + HANH_NAME[MAIN[s].h] + '</span><p class="muted" style="margin:6px 0 0">' + STAR_INFO[s] + '</p></div>'; }).join('');
+  $('kbCung').innerHTML = CUNG.filter(function(c){ return ok(c + CUNG_INFO[c]); }).map(function(c){ return '<div class="it"><b>' + c + '</b><p class="muted" style="margin:6px 0 0">' + CUNG_INFO[c] + '</p></div>'; }).join('');
+  $('kbMinor').innerHTML = Object.keys(MINOR_TYPE).filter(function(s){ return ok(s + (STAR_INFO[s] || '')); }).map(function(s){
+    var t = MINOR_TYPE[s]; return '<div class="it"><b style="color:' + (t == 'g' ? 'var(--ok)' : t == 'b' ? 'var(--bad)' : 'var(--mid)') + '">' + s + '</b><p class="muted" style="margin:6px 0 0">' + (STAR_INFO[s] || '') + '</p></div>'; }).join('');
+}
+$('kbSearch').oninput = function(){ renderKB(this.value); };
+renderKB('');
+
+/* ---------------- MÔ TẢ LÁ SỐ CHO AI ---------------- */
+function chartToText(ch){
+  var L = ch.lunar, inp = ch.input, s = [];
+  s.push('Họ tên: ' + (inp.name || '(ẩn)') + ' — ' + (ch.nam ? 'Nam' : 'Nữ'));
+  s.push('Dương lịch: ' + inp.d + '/' + inp.m + '/' + inp.y + ' ' + pad(inp.hh) + ':' + pad(inp.mi));
+  s.push('Âm lịch: ngày ' + L.day + ' tháng ' + L.month + (L.leap ? ' nhuận' : '') + ' năm ' + CAN[ch.yCan] + ' ' + CHI[ch.yChi] + ', giờ ' + CHI[ch.hour]);
+  s.push((ch.duong ? 'Dương ' : 'Âm ') + (ch.nam ? 'Nam' : 'Nữ') + '; Bản mệnh ' + ch.banMenh.name + '; ' + ch.cucName + '; Mệnh tại ' + CHI[ch.menh] + ', Thân cư ' + ch.cells[ch.than].cung);
+  s.push('Tứ hóa năm ' + CAN[ch.yCan] + ': ' + ch.hoaList[0] + ' Hóa Lộc, ' + ch.hoaList[1] + ' Hóa Quyền, ' + ch.hoaList[2] + ' Hóa Khoa, ' + ch.hoaList[3] + ' Hóa Kỵ');
+  s.push('Tuần tại ' + ch.tuan.map(function(i){ return CHI[i]; }).join('-') + '; Triệt tại ' + ch.triet.map(function(i){ return CHI[i]; }).join('-'));
+  s.push('12 cung:');
+  for (var k = 0; k < 12; k++){
+    var i = mod(ch.menh + k, 12), c = ch.cells[i];
+    var ms = c.main.map(function(x){ return x + '(' + BR_NAME[brightness(x, i)] + (c.hoa[x] ? ', Hóa ' + c.hoa[x][1] : '') + ')'; }).join(', ') || 'Vô chính diệu';
+    var mn = c.minor.map(function(x){ return x + (c.hoa[x] ? '(Hóa ' + c.hoa[x][1] + ')' : ''); }).join(', ');
+    s.push('- ' + c.cung + ' [' + CAN[c.can] + ' ' + CHI[i] + (i == ch.than ? ', THÂN' : '') + ']: ' + ms + (mn ? ' | phụ tinh: ' + mn : '') + ' | ' + c.trangsinh + ' | đại hạn ' + c.dh + '-' + (c.dh + 9));
+  }
+  s.push('Cách cục nhận diện: ' + (ch.cachCuc.map(function(x){ return x.name; }).join(', ') || 'không có cách cục điển hình'));
+  s.push('Năm xem vận: ' + ch.viewYear + ' (' + CAN[mod(ch.viewYear + 6, 10)] + ' ' + CHI[ch.lnChi] + '), tuổi âm ' + ch.age +
+    '; Đại hạn hiện tại: ' + (ch.curDH != null ? 'cung ' + ch.cells[ch.curDH].cung + ' tại ' + CHI[ch.curDH] + ' (' + ch.cells[ch.curDH].dh + '-' + (ch.cells[ch.curDH].dh + 9) + ' tuổi)' : 'chưa vào đại hạn đầu') +
+    '; Lưu niên Thái Tuế tại ' + CHI[ch.lnChi] + ' (cung ' + ch.cells[ch.lnChi].cung + ')');
+  return s.join('\n');
+}
+var SYSTEM_PROMPT = 'Bạn là Huyền — chuyên gia Tử Vi Đẩu Số của IDECO, luận giải bằng tiếng Việt, giọng ấm áp, rõ ràng, chuyên nghiệp. ' +
+  'Nguyên tắc: (1) Chỉ dựa trên dữ liệu lá số được cung cấp, nêu rõ sao/cung làm căn cứ (ví dụ "Mệnh có Thiên Cơ miếu…"), xét tam phương tứ chính, độ sáng, tứ hóa, tuần triệt. ' +
+  '(2) Cân bằng điểm mạnh và điểm cần lưu ý, không phán đoán tuyệt đối, không gieo lo sợ, không đưa lời khuyên y tế/tài chính/pháp lý thay chuyên gia. ' +
+  '(3) Luôn kết thúc bằng 3–5 gợi ý hành động thực tế, tích cực. ' +
+  '(4) Trình bày Markdown: tiêu đề ###, gạch đầu dòng, in đậm ý chính; độ dài vừa đủ, tránh lặp. ' +
+  '(5) Lưu ý: Tử Vi chỉ mang tính tham khảo để hiểu bản thân và định hướng.';
+var TOPIC = {
+  tongquan:'Luận tổng quan tính cách, điểm mạnh, điểm yếu và khuôn mẫu cuộc đời dựa trên cung Mệnh, Thân và tam phương tứ chính.',
+  sunghiep:'Luận chi tiết sự nghiệp: cung Quan Lộc, ngành nghề phù hợp, vai trò nên đảm nhận, thời điểm thuận lợi.',
+  tinhduyen:'Luận tình duyên – hôn nhân: cung Phu Thê, đặc điểm người phối ngẫu, thời điểm duyên đến, điều cần vun đắp.',
+  tailoc:'Luận tài lộc: cung Tài Bạch, Điền Trạch, cách kiếm tiền và quản lý tiền phù hợp, rủi ro cần tránh.',
+  suckhoe:'Luận sức khỏe theo cung Tật Ách và ngũ hành: những hệ cơ quan nên chú ý, thói quen sống nên duy trì (không chẩn đoán bệnh).',
+  giadao:'Luận gia đạo: cung Phụ Mẫu, Huynh Đệ, Điền Trạch, Phúc Đức — quan hệ gia đình và nền tảng phúc phần.',
+  contai:'Luận con cái: cung Tử Tức — duyên con cái, tính cách con, cách nuôi dạy phù hợp.',
+  daihan:'Luận đại hạn 10 năm hiện tại và đại hạn kế tiếp: chủ đề chính, cơ hội, thách thức, nên làm gì.',
+  luunien:'Luận vận hạn năm đang xem (lưu niên): các tháng/việc thuận lợi, điều nên tránh, gợi ý hành động theo quý.'
+};
+document.querySelectorAll('#aiBtns button').forEach(function(b){ b.onclick = function(){ askAI(TOPIC[b.dataset.q], b.textContent); }; });
+$('askBtn').onclick = function(){ var t = $('askIn').value.trim(); if (!t) return; $('askIn').value = ''; askAI(t); };
+$('askIn').addEventListener('keydown', function(e){ if (e.key == 'Enter' && !e.shiftKey){ e.preventDefault(); $('askBtn').click(); } });
+$('btnClearChat').onclick = function(){ CHAT = []; $('chatbox').innerHTML = '<div class="muted">Đã xóa hội thoại.</div>'; };
+
+/* ---------------- Markdown đơn giản ---------------- */
+function md(src){
+  var lines = esc(src).split('\n'), out = [], inList = false, tbl = [];
+  function inline(t){ return t.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/(^|[^*])\*(?!\s)(.+?)\*/g, '$1<i>$2</i>').replace(/`(.+?)`/g, '<code>$1</code>'); }
+  function flushTbl(){
+    if (!tbl.length) return;
+    var rows = tbl.filter(function(r){ return !/^\|?\s*:?-{2,}/.test(r); });
+    out.push('<table>' + rows.map(function(r, i){ var cs = r.replace(/^\||\|$/g, '').split('|');
+      return '<tr>' + cs.map(function(c){ return (i ? '<td>' : '<th>') + inline(c.trim()) + (i ? '</td>' : '</th>'); }).join('') + '</tr>'; }).join('') + '</table>');
+    tbl = [];
+  }
+  lines.forEach(function(l){
+    if (/^\s*\|.*\|\s*$/.test(l)){ if (inList){ out.push('</ul>'); inList = false; } tbl.push(l.trim()); return; } else flushTbl();
+    var m;
+    if ((m = l.match(/^\s*#{1,4}\s+(.*)/))){ if (inList){ out.push('</ul>'); inList = false; } out.push('<h3>' + inline(m[1]) + '</h3>'); }
+    else if ((m = l.match(/^\s*(?:[-*•]|\d+[.)])\s+(.*)/))){ if (!inList){ out.push('<ul>'); inList = true; } out.push('<li>' + inline(m[1]) + '</li>'); }
+    else if (!l.trim()){ if (inList){ out.push('</ul>'); inList = false; } }
+    else { if (inList){ out.push('</ul>'); inList = false; } out.push('<p>' + inline(l) + '</p>'); }
+  });
+  flushTbl(); if (inList) out.push('</ul>');
+  return out.join('');
+}
+
+/* ---------------- CẤU HÌNH + NHIỀU KHÓA ---------------- */
+function cleanKey(k){ return String(k || '').replace(/^\s*Bearer\s+/i, '').replace(/["'\s​-‍﻿]/g, ''); }
+function getCfg(){
+  var c = lsGet('cfg', {});
+  var keys = c.keys && c.keys.length ? c.keys : (c.key ? [c.key] : CONFIG.GEMINI_KEYS.slice());
+  keys = keys.map(cleanKey).filter(Boolean);
+  return { keys: keys, models: (c.models && c.models.length ? c.models : CONFIG.MODELS.slice()),
+           temp: c.temp != null ? c.temp : CONFIG.TEMPERATURE, fbUrl: (c.fbUrl || CONFIG.FIREBASE_URL || '').trim(), updatedAt: c.updatedAt || 0 };
+}
+function saveCfg(c, keepTime){ if (!keepTime) c.updatedAt = Date.now(); lsSet('cfg', c); }
+function keyId(k){ return k.slice(0, 4) + k.slice(-8); }
+function maskKey(k){ return k.length > 14 ? k.slice(0, 6) + '…' + k.slice(-4) : '••••'; }
+function coolOf(k){ var c = lsGet('cool', {})[keyId(k)]; return c && c.until > Date.now() ? c : null; }
+function setCool(k, ms, why){ var c = lsGet('cool', {}); c[keyId(k)] = { until: Date.now() + ms, why: why }; lsSet('cool', c); }
+function clearCool(k){ var c = lsGet('cool', {}); if (k) delete c[keyId(k)]; else c = {}; lsSet('cool', c); }
+function hhmm(t){ var d = new Date(t); return pad(d.getHours()) + ':' + pad(d.getMinutes()) + ' ' + pad(d.getDate()) + '/' + pad(d.getMonth() + 1); }
+
+/* Phân loại lỗi để biết: đổi khóa, đổi model hay dừng */
+function classify(status, msg){
+  if (status == 429 || /RESOURCE_EXHAUSTED|quota|rate limit|exceeded/i.test(msg)) return 'quota';
+  if (/API key not valid|API_KEY_INVALID|expired|UNAUTHENTICATED|invalid authentication|credential|API key/i.test(msg) || status == 401) return 'badkey';
+  if (status == 404 || /not found|is not supported|unknown model|does not exist/i.test(msg)) return 'model';
+  if (status == 403) return /model/i.test(msg) ? 'model' : 'badkey';
+  if (status == 400) return 'model';
+  return 'other';
+}
+var ABORT = null;
+async function callGemini(key, model, system, contents, onText, noThink){
+  var cfg = getCfg();
+  var gen = { temperature: cfg.temp, maxOutputTokens: CONFIG.MAX_TOKENS };
+  if (!noThink){
+    if (/^gemini-[3-9]/.test(model)) gen.thinkingConfig = { thinkingLevel: 'low' };
+    else if (/2\.5-flash/.test(model)) gen.thinkingConfig = { thinkingBudget: 0 };
+  }
+  var body = { systemInstruction: { parts: [{ text: system }] }, contents: contents, generationConfig: gen };
+  var ctrl = new AbortController(); ABORT = ctrl;
+  var total = setTimeout(function(){ ctrl.abort(); }, CONFIG.TIMEOUT_MS), stall = null;
+  function kick(){ clearTimeout(stall); stall = setTimeout(function(){ ctrl.abort(); }, CONFIG.STALL_MS); }
+  function done(){ clearTimeout(total); clearTimeout(stall); }
+  try {
+    kick();
+    var res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(model) + ':streamGenerateContent?alt=sse', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key }, body: JSON.stringify(body), signal: ctrl.signal });
+    if (!res.ok){
+      var et = await res.text().catch(function(){ return ''; });
+      var msg = (et.match(/"message":\s*"([^"]+)/) || [])[1] || et.slice(0, 200);
+      var e = new Error('HTTP ' + res.status + ' — ' + msg); e.status = res.status; e.kind = classify(res.status, msg);
+      if (res.status == 400 && /thinking/i.test(msg) && gen.thinkingConfig) e.kind = 'nothink';
+      throw e;
+    }
+    var reader = res.body.getReader(), dec = new TextDecoder(), buf = '', got = '', finish = '', blockMsg = '';
+    while (true){
+      var r = await reader.read(); if (r.done) break; kick();
+      buf += dec.decode(r.value, { stream: true });
+      var parts = buf.split('\n'); buf = parts.pop();
+      parts.forEach(function(line){
+        line = line.trim(); if (line.indexOf('data:') != 0) return;
+        var js = line.slice(5).trim(); if (!js || js == '[DONE]') return;
+        try {
+          var j = JSON.parse(js);
+          if (j.error){ blockMsg = j.error.message || 'lỗi máy chủ'; return; }
+          var cand = j.candidates && j.candidates[0]; if (!cand) return;
+          if (cand.finishReason) finish = cand.finishReason;
+          ((cand.content && cand.content.parts) || []).forEach(function(pt){ if (pt.text && !pt.thought){ got += pt.text; onText(got); } });
+        } catch(err){}
+      });
+    }
+    done();
+    if (!got){ var e2 = new Error(blockMsg || ('Máy chủ trả về rỗng' + (finish ? ' (' + finish + ')' : ''))); e2.kind = blockMsg ? classify(0, blockMsg) : 'other'; throw e2; }
+    return { text: got, finish: finish };
+  } catch(err){
+    done();
+    if (err.name == 'AbortError'){ var e3 = new Error(ctrl.userStop ? 'Đã dừng.' : 'Quá thời gian chờ phản hồi'); e3.kind = ctrl.userStop ? 'stop' : 'other'; throw e3; }
+    if (!err.kind){ err.kind = /Failed to fetch|NetworkError|Load failed/i.test(err.message) ? 'net' : 'other'; }
+    throw err;
+  }
+}
+/* Vòng xoay: thử từng khóa (bỏ qua khóa đang nghỉ) × từng model */
+async function geminiStream(system, contents, onText, onNote){
+  var cfg = getCfg(), keys = cfg.keys, models = cfg.models;
+  if (!keys.length) throw new Error('Chưa có khóa Google AI Studio — vào ⚙ Cài đặt để thêm khóa.');
+  var kStart = lsGet('keyIdx', 0) % keys.length, mStart = lsGet('modelIdx', 0) % models.length;
+  var order = []; for (var i = 0; i < keys.length; i++) order.push((kStart + i) % keys.length);
+  var ready = order.filter(function(k){ return !coolOf(keys[k]); });
+  if (!ready.length) ready = order.slice(); // tất cả đang nghỉ → vẫn thử lại lần nữa
+  var lastErr = null, tried = 0;
+  for (var a = 0; a < ready.length; a++){
+    var ki = ready[a], key = keys[ki];
+    if (a > 0 && onNote) onNote('🔁 Chuyển sang khóa #' + (ki + 1));
+    for (var b = 0; b < models.length; b++){
+      var mi = (mStart + b) % models.length, model = models[mi];
+      try {
+        tried++;
+        var r;
+        try { r = await callGemini(key, model, system, contents, onText, false); }
+        catch(e0){ if (e0.kind == 'nothink') r = await callGemini(key, model, system, contents, onText, true); else throw e0; }
+        lsSet('keyIdx', ki); lsSet('modelIdx', mi); clearCool(key);
+        var st = lsGet('keyOk', {}); st[keyId(key)] = Date.now(); lsSet('keyOk', st);
+        console.log('[HUYEN-TUVI] OK khóa #' + (ki + 1), model, r.finish);
+        return r;
+      } catch(e){
+        lastErr = e; console.warn('[HUYEN-TUVI] khóa #' + (ki + 1), model, e.kind, e.message);
+        if (e.kind == 'stop' || e.kind == 'net') throw e;
+        if (e.kind == 'quota'){ setCool(key, CONFIG.QUOTA_COOLDOWN_MIN * 60000, 'Hết hạn mức'); break; }
+        if (e.kind == 'badkey'){ setCool(key, CONFIG.BADKEY_COOLDOWN_H * 3600000, 'Khóa sai / hết hạn'); break; }
+        // 'model' hoặc 'other' → thử model kế tiếp với cùng khóa
+      }
+    }
+  }
+  var err = new Error((keys.length > 1 ? 'Đã thử cả ' + keys.length + ' khóa nhưng chưa được. ' : '') + (lastErr ? lastErr.message : 'Không gọi được AI'));
+  err.kind = lastErr && lastErr.kind; throw err;
+}
+function explainErr(e){
+  var m = e.message || String(e);
+  if (/Failed to fetch|NetworkError/i.test(m)) return 'Không kết nối được máy chủ Google (mạng bị chặn hoặc mở bằng file:// trên một số trình duyệt). Hãy mở qua GitHub Pages / http.';
+  if (/401|403|UNAUTHENTICATED|credential|API key/i.test(m)) return 'Khóa Google AI Studio không hợp lệ hoặc đã hết hạn (khóa dạng "AQ." có thời hạn ngắn). Vào ⚙ Cài đặt dán khóa mới. Chi tiết: ' + m;
+  if (/429|quota|RESOURCE_EXHAUSTED/i.test(m)) return 'Tất cả khóa đều đang hết hạn mức. Thêm khóa mới trong ⚙ Cài đặt hoặc thử lại sau. Chi tiết: ' + m;
+  return m;
+}
+function addMsg(box, role, html){
+  if (box.querySelector('.muted') && box.children.length == 1) box.innerHTML = '';
+  var d = document.createElement('div'); d.className = 'msg ' + role;
+  d.innerHTML = (role == 'a' ? '<div class="who">🔮 Huyền</div>' : '') + '<div class="body">' + html + '</div>';
+  box.appendChild(d); box.scrollTop = box.scrollHeight; return d.querySelector('.body');
+}
+var BUSY = false;
+async function askAI(question, label){
+  if (!CH){ toast('Hãy lập lá số trước'); return; }
+  if (BUSY){ toast('Huyền đang trả lời, chờ chút nhé'); return; }
+  BUSY = true; $('askBtn').disabled = true; $('btnStop').style.display = '';
+  $('aiCard').scrollIntoView({behavior:'smooth', block:'start'});
+  var box = $('chatbox');
+  addMsg(box, 'u', esc(label || question));
+  var out = addMsg(box, 'a', '<span class="typing">Huyền đang xem lá số</span>');
+  var first = CHAT.length == 0;
+  var userText = (first ? 'DỮ LIỆU LÁ SỐ:\n' + chartToText(CH) + '\n\nYÊU CẦU: ' : '') + question;
+  CHAT.push({ role: 'user', parts: [{ text: userText }] });
+  try {
+    var r = await geminiStream(SYSTEM_PROMPT, CHAT.slice(-12), function(t){ out.innerHTML = md(t) + '<span class="typing"></span>'; box.scrollTop = box.scrollHeight; }, function(n){ out.innerHTML = '<span class="typing">' + esc(n) + ' — Huyền đang xem lá số</span>'; });
+    out.innerHTML = md(r.text) + (r.finish == 'MAX_TOKENS' ? '<p class="muted">… (câu trả lời dài bị cắt — gõ "viết tiếp" để Huyền nói tiếp)</p>' : '');
+    CHAT.push({ role: 'model', parts: [{ text: r.text }] });
+  } catch(e){
+    CHAT.pop();
+    out.innerHTML = '<p style="color:var(--bad)">⚠️ ' + esc(explainErr(e)) + '</p>';
+  }
+  if (CHAT.length && CHAT[0].parts[0].text.indexOf('DỮ LIỆU LÁ SỐ') != 0){ CHAT = []; }
+  BUSY = false; $('askBtn').disabled = false; $('btnStop').style.display = 'none';
+}
+$('btnStop').onclick = function(){ if (ABORT){ ABORT.userStop = true; ABORT.abort(); } };
+
+/* ---------------- XEM HỢP ---------------- */
+var SINH = {kim:'thuy', thuy:'moc', moc:'hoa', hoa:'tho', tho:'kim'};
+var KHAC = {kim:'moc', moc:'tho', tho:'thuy', thuy:'hoa', hoa:'kim'};
+function chiRel(a, b){
+  if (a == b) return ['Cùng chi ' + CHI[a], 1];
+  if (a % 4 == b % 4) return ['Tam hợp (' + CHI[a] + ' – ' + CHI[b] + ')', 2];
+  if ((a + b) % 12 == 1) return ['Lục hợp (' + CHI[a] + ' – ' + CHI[b] + ')', 2];
+  if (Math.abs(a - b) == 6) return ['Lục xung (' + CHI[a] + ' – ' + CHI[b] + ')', -2];
+  if ((a + b) % 12 == 7) return ['Lục hại (' + CHI[a] + ' – ' + CHI[b] + ')', -1];
+  return ['Bình hòa (' + CHI[a] + ' – ' + CHI[b] + ')', 0];
+}
+function hanhRel(a, b){
+  var A = HANH_NAME[a], B = HANH_NAME[b];
+  if (a == b) return ['Đồng hành ' + A, 1];
+  if (SINH[a] == b) return [A + ' sinh ' + B + ' (tương sinh)', 2];
+  if (SINH[b] == a) return [B + ' sinh ' + A + ' (tương sinh)', 2];
+  if (KHAC[a] == b) return [A + ' khắc ' + B + ' (tương khắc)', -2];
+  if (KHAC[b] == a) return [B + ' khắc ' + A + ' (tương khắc)', -2];
+  return ['Bình', 0];
+}
+function canRel(a, b){
+  if (Math.abs(a - b) == 5) return ['Thiên can hợp (' + CAN[a] + ' – ' + CAN[b] + ')', 1];
+  if (Math.abs(a - b) == 6) return ['Thiên can xung (' + CAN[a] + ' – ' + CAN[b] + ')', -1];
+  return ['Thiên can bình (' + CAN[a] + ' – ' + CAN[b] + ')', 0];
+}
+function hopScore(A, B){
+  var f = [];
+  f.push(['Ngũ hành bản mệnh: ' + A.banMenh.name + ' & ' + B.banMenh.name].concat([hanhRel(A.banMenh.hanh, B.banMenh.hanh)]));
+  f.push(['Địa chi năm sinh'].concat([chiRel(A.yChi, B.yChi)]));
+  f.push(['Thiên can năm sinh'].concat([canRel(A.yCan, B.yCan)]));
+  f.push(['Cung Mệnh (' + CHI[A.menh] + ' & ' + CHI[B.menh] + ')'].concat([chiRel(A.menh, B.menh)]));
+  f.push(['Cục: ' + A.cucName + ' & ' + B.cucName].concat([hanhRel(A.menhNapAm.hanh, B.menhNapAm.hanh)]));
+  var raw = f.reduce(function(s, x){ return s + x[1][1]; }, 0); // -9..9
+  var score = Math.round(((raw + 9) / 18) * 10 * 10) / 10;
+  score = Math.max(1, Math.min(10, score));
+  return { factors: f, score: score };
+}
+var HOP_LABEL = {tinhduyen:'tình duyên / vợ chồng', truochon:'tiền hôn nhân (trước khi cưới)', hoptac:'hợp tác làm ăn', chacon:'cha mẹ – con cái'};
+$('btnHop').onclick = async function(){
+  var a = readForm('a'), b = readForm('b');
+  if (!a || !b){ toast('Nhập đủ ngày sinh hai người'); return; }
+  var A = buildChart(a), B = buildChart(b), r = hopScore(A, B), type = $('hopType').value;
+  $('hopResult').style.display = 'block';
+  $('hopScore').textContent = r.score.toFixed(1) + '/10';
+  $('hopBar').style.width = (r.score * 10) + '%';
+  $('hopVerdict').textContent = r.score >= 8 ? 'Rất hợp — nền tảng hòa hợp tốt' : r.score >= 6.5 ? 'Khá hợp — bổ trợ nhau' : r.score >= 5 ? 'Trung bình — cần thấu hiểu và dung hòa' : 'Nhiều thử thách — cần nỗ lực và khéo léo';
+  $('hopFactors').innerHTML = '<h3>Các yếu tố</h3>' + r.factors.map(function(x){ var v = x[1][1];
+    return '<div class="factor"><span>' + x[0] + '<br><span class="muted">' + x[1][0] + '</span></span><span class="' + (v > 0 ? 'pos' : v < 0 ? 'neg' : 'muted') + '">' + (v > 0 ? '+' : '') + v + '</span></div>'; }).join('');
+  var box = $('hopChat'); box.innerHTML = '';
+  var out = addMsg(box, 'a', '<span class="typing">Huyền đang so hai lá số</span>');
+  $('hopResult').scrollIntoView({behavior:'smooth'});
+  var prompt = 'Phân tích mức độ hợp nhau về ' + HOP_LABEL[type] + ' giữa hai người.\nĐiểm tham khảo đã tính: ' + r.score + '/10 (' +
+    r.factors.map(function(x){ return x[0] + ': ' + x[1][0]; }).join('; ') + ').\n\n=== NGƯỜI A ===\n' + chartToText(A) + '\n\n=== NGƯỜI B ===\n' + chartToText(B) +
+    '\n\nHãy so sánh cung Mệnh, ' + (type == 'hoptac' ? 'Quan Lộc, Tài Bạch, Nô Bộc' : type == 'chacon' ? 'Phụ Mẫu, Tử Tức, Phúc Đức' : 'Phu Thê, Phúc Đức') +
+    ' của hai người; nêu điểm hòa hợp, điểm dễ xung đột, cách dung hòa cụ thể và thời điểm thuận lợi.';
+  try {
+    var res = await geminiStream(SYSTEM_PROMPT, [{ role: 'user', parts: [{ text: prompt }] }], function(t){ out.innerHTML = md(t) + '<span class="typing"></span>'; }, function(n){ out.innerHTML = '<span class="typing">' + esc(n) + '</span>'; });
+    out.innerHTML = md(res.text);
+  } catch(e){ out.innerHTML = '<p style="color:var(--bad)">⚠️ ' + esc(explainErr(e)) + '</p>'; }
+};
+
+/* ---------------- FIREBASE REALTIME (REST, không cần SDK) ---------------- */
+function fbBase(){ var u = (getCfg().fbUrl || '').trim().replace(/\/+$/, ''); return u ? u + '/' + CONFIG.FB_NODE : ''; }
+async function fbReq(path, method, data){
+  var base = fbBase(); if (!base) return null;
+  var ctrl = new AbortController(), t = setTimeout(function(){ ctrl.abort(); }, 15000);
+  try {
+    var r = await fetch(base + '/' + path + '.json', { method: method || 'GET', signal: ctrl.signal,
+      headers: data ? { 'Content-Type': 'application/json' } : undefined, body: data ? JSON.stringify(data) : undefined });
+    clearTimeout(t);
+    if (!r.ok) throw new Error('Firebase HTTP ' + r.status + (r.status == 401 ? ' (quy tắc Rules đang chặn đọc/ghi)' : ''));
+    return await r.json();
+  } catch(e){ clearTimeout(t); throw e.name == 'AbortError' ? new Error('Firebase quá thời gian chờ') : e; }
+}
+function setFbStatus(t, ok){ var el = $('fbStat'); if (el){ el.textContent = t; el.style.color = ok ? 'var(--ok)' : ok === false ? 'var(--bad)' : 'var(--tx2)'; } FB_STATUS = [t, ok]; }
+var FB_STATUS = ['Chưa cấu hình Firebase', null];
+async function fbPushCfg(){
+  var c = getCfg(); if (!fbBase()) return;
+  await fbReq('config', 'PUT', { keys: c.keys, models: c.models, temp: c.temp, updatedAt: c.updatedAt || Date.now() });
+}
+async function fbPushProfiles(){
+  if (!fbBase()) return;
+  try { await fbReq('profiles', 'PUT', { list: lsGet('profiles', []), updatedAt: lsGet('profilesAt', Date.now()) }); setFbStatus('✅ Đã đồng bộ hồ sơ lên Firebase', true); }
+  catch(e){ setFbStatus('⚠️ ' + e.message, false); }
+}
+async function fbPullAll(){
+  if (!fbBase()){ setFbStatus('Chưa cấu hình Firebase', null); return; }
+  try {
+    var rc = await fbReq('config'), local = getCfg();
+    if (rc && rc.keys && (rc.updatedAt || 0) > (local.updatedAt || 0)){
+      saveCfg({ keys: rc.keys, models: rc.models || local.models, temp: rc.temp != null ? rc.temp : local.temp, fbUrl: local.fbUrl, updatedAt: rc.updatedAt }, true);
+      console.log('[HUYEN-TUVI] nạp cấu hình từ Firebase');
+    } else if (!rc || (local.updatedAt || 0) > (rc.updatedAt || 0)) { await fbPushCfg(); }
+    var rp = await fbReq('profiles'), lpAt = lsGet('profilesAt', 0);
+    if (rp && rp.list && (rp.updatedAt || 0) > lpAt){ lsSet('profiles', rp.list); lsSet('profilesAt', rp.updatedAt); renderProfiles(); }
+    else if (lsGet('profiles', []).length && (!rp || lpAt > (rp.updatedAt || 0))) await fbPushProfiles();
+    setFbStatus('✅ Đã kết nối Firebase · ' + hhmm(Date.now()), true);
+  } catch(e){ setFbStatus('⚠️ ' + e.message, false); console.warn('[HUYEN-TUVI] Firebase', e); }
+}
+
+/* ---------------- MẬT KHẨU CÀI ĐẶT ---------------- */
+function djb2(s){ var h = 5381; for (var i = 0; i < s.length; i++) h = ((h * 33) ^ s.charCodeAt(i)) >>> 0; return h; }
+async function checkPass(p){
+  try {
+    if (window.crypto && crypto.subtle){
+      var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(p));
+      return Array.from(new Uint8Array(buf)).map(function(b){ return b.toString(16).padStart(2, '0'); }).join('') === CONFIG.PASS_SHA256;
+    }
+  } catch(e){}
+  return djb2(p) === CONFIG.PASS_DJB2;
+}
+function isUnlocked(){ try { return sessionStorage.getItem(LS + '-unlock') == '1'; } catch(e){ return false; } }
+$('btnSet').onclick = function(){
+  if (isUnlocked()){ openSettings(); return; }
+  openModal('<h2>🔒 Cài đặt được bảo vệ</h2><label>Mật khẩu quản trị</label><input id="pw" type="password" autocomplete="current-password">' +
+    '<div class="row" style="margin-top:12px"><button class="btn pri" id="pwOk">Mở khóa</button><span class="muted" id="pwMsg"></span></div>');
+  var go2 = async function(){
+    if (await checkPass($('pw').value)){ try { sessionStorage.setItem(LS + '-unlock', '1'); } catch(e){} openSettings(); }
+    else { $('pwMsg').textContent = '❌ Sai mật khẩu'; $('pwMsg').style.color = 'var(--bad)'; $('pw').select(); }
+  };
+  $('pwOk').onclick = go2; $('pw').onkeydown = function(e){ if (e.key == 'Enter') go2(); };
+  setTimeout(function(){ $('pw').focus(); }, 50);
+};
+
+/* ---------------- CÀI ĐẶT ---------------- */
+var SKEYS = [];
+function renderKeyList(){
+  var cur = lsGet('keyIdx', 0), ok = lsGet('keyOk', {});
+  $('keyList').innerHTML = SKEYS.length ? SKEYS.map(function(k, i){
+    var c = coolOf(k), st = c ? '<span class="neg">' + (c.why == 'Hết hạn mức' ? '⏳ Hết hạn mức, thử lại sau ' : '⛔ ' + c.why + ' · thử lại sau ') + hhmm(c.until) + '</span>'
+      : (i == cur % SKEYS.length ? '<span class="pos">★ Đang dùng</span>' : '<span class="muted">Sẵn sàng</span>');
+    var last = ok[keyId(k)] ? '<span class="muted"> · chạy tốt lần cuối ' + hhmm(ok[keyId(k)]) + '</span>' : '';
+    return '<div class="prof"><div><b>#' + (i + 1) + '</b> <code>' + esc(maskKey(k)) + '</code> <span class="muted">(' + k.length + ' ký tự)</span><br>' + st + last + '<div class="muted" id="kt' + i + '"></div></div>' +
+      '<div class="row"><button class="btn" data-ku="' + i + '" title="Ưu tiên lên trên">▲</button><button class="btn" data-kt="' + i + '" title="Kiểm tra khóa">🩺</button>' +
+      (c ? '<button class="btn" data-kr="' + i + '" title="Bỏ trạng thái nghỉ">↺</button>' : '') + '<button class="btn" data-kd="' + i + '" title="Xóa">🗑</button></div></div>';
+  }).join('') : '<p class="muted">Chưa có khóa nào.</p>';
+}
+function openSettings(){
+  var c = getCfg(); SKEYS = c.keys.slice();
+  openModal('<h2>⚙ Cài đặt AI &amp; đồng bộ</h2>' +
+    '<h3>🔑 Khóa Google AI Studio (' + '<span id="kCount">' + SKEYS.length + '</span>)</h3>' +
+    '<p class="muted">Thứ tự từ trên xuống. Khóa nào hết hạn mức (HTTP 429) sẽ tạm nghỉ ' + CONFIG.QUOTA_COOLDOWN_MIN + ' phút và Huyền tự chuyển sang khóa kế tiếp; khóa sai/hết hạn nghỉ ' + CONFIG.BADKEY_COOLDOWN_H + ' giờ.</p>' +
+    '<div id="keyList"></div>' +
+    '<label style="margin-top:8px">Thêm khóa (dán nhiều khóa, mỗi dòng một khóa)</label><textarea id="kNew" rows="2" placeholder="AQ.… hoặc AIza…"></textarea>' +
+    '<div class="row" style="margin-top:6px"><button class="btn" id="kAdd">➕ Thêm khóa</button><button class="btn" id="kTestAll">🩺 Kiểm tra tất cả</button><button class="btn" id="kClearCool">↺ Bỏ nghỉ tất cả</button></div>' +
+    '<h3>🧠 Model</h3><label>Chuỗi model (mỗi dòng một model — model đầu là chính, lỗi thì tự tụt)</label><textarea id="sModels" rows="3">' + esc(c.models.join('\n')) + '</textarea>' +
+    '<label style="margin-top:10px">Độ sáng tạo (0–1.5): <b id="sTv">' + c.temp + '</b></label><input id="sTemp" type="range" min="0" max="1.5" step="0.1" value="' + c.temp + '">' +
+    '<h3>☁️ Firebase Realtime Database</h3><label>databaseURL (ví dụ https://ten-du-an-default-rtdb.firebaseio.com)</label><input id="sFb" value="' + esc(c.fbUrl) + '" placeholder="https://…firebaseio.com">' +
+    '<p class="muted" id="fbStat"></p><p class="muted">Đồng bộ khóa, model và hồ sơ lá số ở nhánh /' + CONFIG.FB_NODE + ' cho mọi máy dùng chung.</p>' +
+    '<div class="row" style="margin-top:14px"><button class="btn pri" id="sSave">💾 Lưu &amp; đồng bộ</button><button class="btn" id="sPull">⟳ Tải từ Firebase</button><button class="btn" id="sLock">🔒 Khóa cài đặt</button><button class="btn" id="sReset">↺ Mặc định</button></div>' +
+    '<pre id="sOut" class="muted" style="white-space:pre-wrap;margin-top:10px"></pre><p class="muted">Bản dựng ' + CONFIG.BUILD + '</p>');
+  setFbStatus(FB_STATUS[0], FB_STATUS[1]);
+  renderKeyList();
+  $('sTemp').oninput = function(){ $('sTv').textContent = this.value; };
+  $('keyList').onclick = async function(e){
+    var b = e.target.closest('button'); if (!b) return;
+    if (b.dataset.kd != null){ if (!confirm('Xóa khóa #' + (+b.dataset.kd + 1) + '?')) return; SKEYS.splice(+b.dataset.kd, 1); }
+    else if (b.dataset.ku != null){ var i = +b.dataset.ku; if (i > 0){ var t = SKEYS[i]; SKEYS[i] = SKEYS[i - 1]; SKEYS[i - 1] = t; } }
+    else if (b.dataset.kr != null){ clearCool(SKEYS[+b.dataset.kr]); }
+    else if (b.dataset.kt != null){ await testKey(+b.dataset.kt); return; }
+    $('kCount').textContent = SKEYS.length; renderKeyList();
+  };
+  $('kAdd').onclick = function(){
+    var add = $('kNew').value.split(/[\n,;]+/).map(cleanKey).filter(function(k){ return k.length > 10 && SKEYS.indexOf(k) < 0; });
+    if (!add.length){ toast('Không có khóa mới hợp lệ'); return; }
+    SKEYS = SKEYS.concat(add); $('kNew').value = ''; $('kCount').textContent = SKEYS.length; renderKeyList(); toast('Đã thêm ' + add.length + ' khóa — bấm 💾 Lưu để ghi');
+  };
+  $('kTestAll').onclick = async function(){ for (var i = 0; i < SKEYS.length; i++) await testKey(i); };
+  $('kClearCool').onclick = function(){ clearCool(); renderKeyList(); toast('Đã bỏ trạng thái nghỉ của mọi khóa'); };
+  $('sSave').onclick = async function(){
+    var models = $('sModels').value.split(/\n|,/).map(function(x){ return x.trim(); }).filter(Boolean);
+    if (!SKEYS.length){ toast('Cần ít nhất 1 khóa'); return; }
+    saveCfg({ keys: SKEYS.slice(), models: models.length ? models : CONFIG.MODELS.slice(), temp: +$('sTemp').value, fbUrl: $('sFb').value.trim() });
+    lsSet('modelIdx', 0); if (lsGet('keyIdx', 0) >= SKEYS.length) lsSet('keyIdx', 0);
+    if (fbBase()){
+      setFbStatus('Đang ghi lên Firebase…');
+      try { await fbPushCfg(); await fbPushProfiles(); setFbStatus('✅ Đã lưu & đồng bộ Firebase · ' + hhmm(Date.now()), true); toast('Đã lưu & đồng bộ'); }
+      catch(e){ setFbStatus('⚠️ Lưu trên máy được, nhưng Firebase lỗi: ' + e.message, false); }
+    } else toast('Đã lưu trên máy này');
+  };
+  $('sPull').onclick = async function(){
+    saveCfg(Object.assign(getCfg(), { fbUrl: $('sFb').value.trim() }), true);
+    setFbStatus('Đang tải…'); await fbPullAll(); var c2 = getCfg(); SKEYS = c2.keys.slice(); $('kCount').textContent = SKEYS.length; $('sModels').value = c2.models.join('\n'); renderKeyList();
+  };
+  $('sLock').onclick = function(){ try { sessionStorage.removeItem(LS + '-unlock'); } catch(e){} closeModal(); toast('Đã khóa cài đặt'); };
+  $('sReset').onclick = function(){ if (!confirm('Đưa khóa & model về mặc định trong file?')) return; var fb = getCfg().fbUrl; saveCfg({ keys: CONFIG.GEMINI_KEYS.slice(), models: CONFIG.MODELS.slice(), temp: CONFIG.TEMPERATURE, fbUrl: fb }); lsSet('modelIdx', 0); lsSet('keyIdx', 0); openSettings(); };
+}
+async function testKey(i){
+  var k = SKEYS[i], el = $('kt' + i); if (!el) return;
+  el.textContent = '🩺 Đang thử…';
+  var models = $('sModels').value.split(/\n|,/).map(function(x){ return x.trim(); }).filter(Boolean), log = [];
+  for (var m = 0; m < models.length; m++){
+    try {
+      await callGemini(k, models[m], 'Trả lời đúng một từ.', [{ role: 'user', parts: [{ text: 'Chào' }] }], function(){}, false)
+        .catch(function(e){ if (e.kind == 'nothink') return callGemini(k, models[m], 'Trả lời đúng một từ.', [{ role: 'user', parts: [{ text: 'Chào' }] }], function(){}, true); throw e; });
+      clearCool(k); var st = lsGet('keyOk', {}); st[keyId(k)] = Date.now(); lsSet('keyOk', st);
+      el.innerHTML = '<span class="pos">✅ Chạy tốt với ' + esc(models[m]) + '</span>' + (log.length ? ' <span class="muted">(' + esc(log.join('; ')) + ')</span>' : '');
+      return;
+    } catch(e){
+      log.push(models[m] + ': ' + e.message.slice(0, 90));
+      if (e.kind == 'quota' || e.kind == 'badkey' || e.kind == 'net') break;
+    }
+  }
+  el.innerHTML = '<span class="neg">❌ ' + esc(log.join(' | ')) + '</span>';
+}
+
+/* ---------------- KHỞI ĐỘNG ---------------- */
+(function(){
+  var last = lsGet('last', null);
+  if (last){ fillForm(last); }
+  fbPullAll();
+  document.addEventListener('keydown', function(e){ if (e.key == 'Escape') closeModal(); });
+})();
+</script>
+</body>
+</html>
