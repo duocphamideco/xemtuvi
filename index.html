@@ -107,6 +107,9 @@ textarea{resize:vertical}
 .factor{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed var(--line);font-size:14px}
 .pos{color:var(--ok);font-weight:700}.neg{color:var(--bad);font-weight:700}
 .prof{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border:1px solid var(--line);border-radius:10px;margin:6px 0;background:var(--bg2)}
+#gate{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px;background:var(--bg);background-image:radial-gradient(circle at 20% 10%,rgba(238,58,35,.25),transparent 45%),radial-gradient(circle at 85% 90%,rgba(232,184,74,.2),transparent 45%)}
+#gate .gbox{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:28px 24px;width:100%;max-width:380px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+#gate .ic{border-radius:16px;background:linear-gradient(135deg,var(--red),#a3180a);display:grid;place-items:center;box-shadow:0 6px 18px rgba(238,58,35,.45)}
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:10px 18px;border-radius:10px;z-index:200;display:none;font-size:14px}
 .kb .it{border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--bg2)}
 .kb .it b{font-size:15px}
@@ -114,15 +117,24 @@ textarea{resize:vertical}
 @media(max-width:640px){.hwrap{gap:8px}nav{margin-left:0}nav button{padding:7px 10px;font-size:13px}.card{padding:14px}}
 </style>
 
-    <link rel="manifest" href="./manifest.json?v=3-d20a48f3-48bddde5">
-    <link rel="icon" href="./ideco-icon-192.png?v=3-d20a48f3-48bddde5" type="image/png">
-    <link rel="apple-touch-icon" sizes="180x180" href="./ideco-apple-touch-icon.png?v=3-d20a48f3-48bddde5">
+    <link rel="manifest" href="./manifest.json?v=3-d20a48f3-4d9d5a8d">
+    <link rel="icon" href="./ideco-icon-192.png?v=3-d20a48f3-4d9d5a8d" type="image/png">
+    <link rel="apple-touch-icon" sizes="180x180" href="./ideco-apple-touch-icon.png?v=3-d20a48f3-4d9d5a8d">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-title" content="TỬ VI">
-    <script src="./ideco-pwa.js?v=3-d20a48f3-48bddde5" defer=""></script>
+    <meta name="apple-mobile-web-app-title" content="XEM TỬ VI">
+    <script src="./ideco-pwa.js?v=3-d20a48f3-4d9d5a8d" defer=""></script>
   </head>
 <body>
+<div id="gate"><div class="gbox">
+  <div class="ic" style="width:64px;height:64px;font-size:34px;margin:0 auto 10px">⛵</div>
+  <h2 style="margin:0">HUYỀN · TỬ VI AI</h2><p class="muted" style="margin:4px 0 16px">IDECO — vui lòng nhập mật khẩu để sử dụng</p>
+  <div style="position:relative"><input id="gPass" type="password" placeholder="Mật khẩu" autocomplete="current-password" style="padding-right:46px">
+  <button id="gEye" type="button" title="Hiện/ẩn mật khẩu" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:0;font-size:18px;cursor:pointer;color:var(--tx2)">👁</button></div>
+  <label style="display:flex;gap:6px;align-items:center;margin:10px 0 0;justify-content:center"><input type="checkbox" id="gRemember" checked="" style="width:auto"> Ghi nhớ trên máy này</label>
+  <button class="btn pri" id="gBtn" style="width:100%;margin-top:14px;padding:12px">Vào ứng dụng</button>
+  <p id="gMsg" style="color:var(--bad);min-height:20px;margin:10px 0 0"></p>
+</div></div>
 <header><div class="hwrap">
   <div class="logo"><div class="ic">⛵</div><div><b>HUYỀN · TỬ VI AI</b><small>IDECO — lập lá số &amp; luận giải thông minh · <span id="fbBadge" title="Trạng thái đồng bộ Firebase">☁️ …</span></small></div></div>
   <nav>
@@ -241,22 +253,30 @@ textarea{resize:vertical}
    HUYỀN · TỬ VI AI — IDECO   (BUILD 20261108-1)
    ===================================================================== */
 var CONFIG = {
-  BUILD: '20261109-1',
-  // Danh sách khóa Google AI Studio mặc định (thêm/bớt trong ⚙ Cài đặt). Hết hạn mức → tự chuyển khóa kế tiếp.
-  GEMINI_KEYS: ['AQ.Ab8RN6LDYxbCHgiTMb2DLgtyVqpeb00y1Dp7sdpu-Xoglk3NIg'],
-  // Chuỗi model: model đầu là model chính; tên sai / chưa mở thì tự tụt model kế tiếp
-  MODELS: ['gemini-3.8-flash', 'gemini-3-flash-preview', 'gemini-2.5-flash'],
+  BUILD: '20261109-2',
+  // ===== TUYẾN AI =====
+  PROVIDER: 'kie',              // tuyến chính: 'kie' (Kie.ai) hoặc 'google' (Google AI Studio)
+  BACKUP_OTHER: true,           // hết khóa tuyến chính thì tự dùng tuyến còn lại
+  KIE_URL: 'https://api.kie.ai/gemini/v1/models/{model}:streamGenerateContent',
+  KIE_KEYS: [],                 // khóa Kie.ai — nhập trong ⚙ Cài đặt (tự lưu Firebase)
+  KIE_MODELS: ['gemini-3-8-flash'],
+  GOOGLE_KEYS: ['AQ.Ab8RN6LDYxbCHgiTMb2DLgtyVqpeb00y1Dp7sdpu-Xoglk3NIg'],
+  GOOGLE_MODELS: ['gemini-3.8-flash', 'gemini-3-flash-preview', 'gemini-2.5-flash'],
+  THINK_LEVEL: 'low',           // low | medium | high — cao thì kỹ hơn nhưng chậm hơn
   TEMPERATURE: 0.8,
   MAX_TOKENS: 8192,
-  TIMEOUT_MS: 120000,          // trần tổng cho 1 lượt
-  STALL_MS: 45000,             // không nhận thêm byte nào trong 45s thì cắt
-  QUOTA_COOLDOWN_MIN: 60,      // khóa hết hạn mức: tạm nghỉ 60 phút rồi mới thử lại
-  BADKEY_COOLDOWN_H: 24,       // khóa sai / hết hạn: tạm nghỉ 24 giờ
-  // Firebase Realtime Database — dán databaseURL vào đây (hoặc nhập trong ⚙ Cài đặt)
+  TIMEOUT_MS: 180000,           // trần tổng cho 1 lượt
+  STALL_MS: 60000,              // không nhận thêm byte nào trong 60s thì cắt
+  QUOTA_COOLDOWN_MIN: 60,       // khóa hết hạn mức: tạm nghỉ 60 phút
+  BADKEY_COOLDOWN_H: 24,        // khóa sai / hết hạn: tạm nghỉ 24 giờ
+  // ===== FIREBASE =====
   FIREBASE_URL: 'https://luutuvi-f14fa-default-rtdb.firebaseio.com',   // dự án luutuvi-f14fa
-  FB_NODE: 'huyenTuVi',        // nhánh lưu: /huyenTuVi/config và /huyenTuVi/profiles
-  PASS_SHA256: 'b8a57977041c2b2ba8baab472c1f0240a30b671a9fb027f9e4d73b52818b0b29',
-  PASS_DJB2: 3737427541
+  FB_NODE: 'huyenTuVi',         // /huyenTuVi/config, /huyenTuVi/profiles, /huyenTuVi/auth
+  // ===== MẬT KHẨU (chỉ lưu mã băm) =====
+  PASS_SHA256: 'b8a57977041c2b2ba8baab472c1f0240a30b671a9fb027f9e4d73b52818b0b29',   // quản trị (mở Cài đặt)
+  PASS_DJB2: 3737427541,
+  LOGIN_SHA256: 'fd4d10d29037a5761c46d6fa6edc0fb2a52dcd1f9f391a1f61983711d5c3f4c4',  // vào ứng dụng (mặc định)
+  LOGIN_DJB2: 3322758511
 };
 var LS = 'huyen-tuvi';
 console.log('[HUYEN-TUVI] build', CONFIG.BUILD);
@@ -787,16 +807,30 @@ function md(src){
   return out.join('');
 }
 
-/* ---------------- CẤU HÌNH + NHIỀU KHÓA ---------------- */
+/* ---------------- CẤU HÌNH: 2 TUYẾN AI (Kie.ai chính + Google AI Studio dự phòng) ---------------- */
+var PROVS = ['kie', 'google'];
+var PROV_NAME = { kie: 'Kie.ai', google: 'Google AI Studio' };
 function cleanKey(k){ return String(k || '').replace(/^\s*Bearer\s+/i, '').replace(/["'\s​-‍﻿]/g, ''); }
+function cleanList(a){ var out = []; (a || []).map(cleanKey).forEach(function(k){ if (k && out.indexOf(k) < 0) out.push(k); }); return out; }
 function getCfg(){
   var c = lsGet('cfg', {});
-  var keys = c.keys && c.keys.length ? c.keys : (c.key ? [c.key] : CONFIG.GEMINI_KEYS.slice());
-  keys = keys.map(cleanKey).filter(Boolean);
-  return { keys: keys, models: (c.models && c.models.length ? c.models : CONFIG.MODELS.slice()),
-           temp: c.temp != null ? c.temp : CONFIG.TEMPERATURE, fbUrl: (c.fbUrl || CONFIG.FIREBASE_URL || '').trim(), updatedAt: c.updatedAt || 0 };
+  return {
+    provider: c.provider || CONFIG.PROVIDER,
+    backup: c.backup != null ? c.backup : CONFIG.BACKUP_OTHER,
+    kieKeys: cleanList(c.kieKeys || CONFIG.KIE_KEYS),
+    googleKeys: cleanList(c.googleKeys || c.keys || CONFIG.GOOGLE_KEYS),   // c.keys = định dạng cũ
+    kieModels: (c.kieModels && c.kieModels.length ? c.kieModels : CONFIG.KIE_MODELS.slice()),
+    googleModels: (c.googleModels && c.googleModels.length ? c.googleModels : (c.models && c.models.length ? c.models : CONFIG.GOOGLE_MODELS.slice())),
+    kieUrl: c.kieUrl || CONFIG.KIE_URL,
+    think: c.think || CONFIG.THINK_LEVEL,
+    temp: c.temp != null ? c.temp : CONFIG.TEMPERATURE,
+    fbUrl: (c.fbUrl || CONFIG.FIREBASE_URL || '').trim(),
+    updatedAt: c.updatedAt || 0
+  };
 }
-function saveCfg(c, keepTime){ if (!keepTime) c.updatedAt = Date.now(); lsSet('cfg', c); }
+function saveCfg(c, keepTime){ if (!keepTime) c.updatedAt = Date.now(); var o = Object.assign({}, c); delete o.keys; delete o.models; lsSet('cfg', o); }
+function provKeys(c, p){ return p == 'kie' ? c.kieKeys : c.googleKeys; }
+function provModels(c, p){ return p == 'kie' ? c.kieModels : c.googleModels; }
 function keyId(k){ return k.slice(0, 4) + k.slice(-8); }
 function maskKey(k){ return k.length > 14 ? k.slice(0, 6) + '…' + k.slice(-4) : '••••'; }
 function coolOf(k){ var c = lsGet('cool', {})[keyId(k)]; return c && c.until > Date.now() ? c : null; }
@@ -806,104 +840,154 @@ function hhmm(t){ var d = new Date(t); return pad(d.getHours()) + ':' + pad(d.ge
 
 /* Phân loại lỗi để biết: đổi khóa, đổi model hay dừng */
 function classify(status, msg){
-  if (status == 429 || /RESOURCE_EXHAUSTED|quota|rate limit|exceeded/i.test(msg)) return 'quota';
-  if (/API key not valid|API_KEY_INVALID|expired|UNAUTHENTICATED|invalid authentication|credential|API key/i.test(msg) || status == 401) return 'badkey';
-  if (status == 404 || /not found|is not supported|unknown model|does not exist/i.test(msg)) return 'model';
+  msg = String(msg || '');
+  if (status == 429 || status == 402 || /RESOURCE_EXHAUSTED|quota|rate limit|exceeded|insufficient|credit|balance|余额/i.test(msg)) return 'quota';
+  if (status == 401 || /API key not valid|API_KEY_INVALID|expired|UNAUTHENTICATED|unauthori[sz]ed|authentication failed|invalid.*(key|token)|credential|API key/i.test(msg)) return 'badkey';
+  if (status == 404 || /not found|is not supported|unknown model|does not exist|model.*(invalid|not exist)/i.test(msg)) return 'model';
   if (status == 403) return /model/i.test(msg) ? 'model' : 'badkey';
-  if (status == 400) return 'model';
+  if (status == 400) return 'bad';
   return 'other';
 }
+/* Lấy chữ trả lời từ 1 mẩu dữ liệu Gemini (kể cả khi Kie bọc trong {code,msg,data}) */
+function pickText(j){
+  if (!j || typeof j != 'object') return { text: '' };
+  if (j.data && typeof j.data == 'object' && !j.candidates) { var inner = pickText(j.data); if (inner.text || inner.finish) return inner; }
+  var cand = j.candidates && j.candidates[0], t = '';
+  if (cand) ((cand.content && cand.content.parts) || []).forEach(function(pt){ if (pt.text && !pt.thought) t += pt.text; });
+  return { text: t, finish: cand && cand.finishReason };
+}
+function pickError(j){
+  if (!j || typeof j != 'object') return null;
+  if (j.error) return { status: j.error.code || 0, msg: j.error.message || JSON.stringify(j.error) };
+  if (j.code != null && +j.code != 200 && +j.code != 0 && !j.candidates) return { status: +j.code, msg: j.msg || j.message || ('mã ' + j.code) };
+  return null;
+}
 var ABORT = null;
-async function callGemini(key, model, system, contents, onText, noThink){
+/* mode 0: đầy đủ (systemInstruction + thinkingConfig); mode 1: tối giản (ghép chỉ dẫn vào câu hỏi, không thinkingConfig) */
+async function callAI(prov, key, model, system, contents, onText, mode){
   var cfg = getCfg();
   var gen = { temperature: cfg.temp, maxOutputTokens: CONFIG.MAX_TOKENS };
-  if (!noThink){
-    if (/^gemini-[3-9]/.test(model)) gen.thinkingConfig = { thinkingLevel: 'low' };
+  var body = { contents: contents, generationConfig: gen };
+  if (mode == 0){
+    body.systemInstruction = { parts: [{ text: system }] };
+    if (/gemini-[3-9]/.test(model)) gen.thinkingConfig = { thinkingLevel: cfg.think, includeThoughts: cfg.think != 'low' };
     else if (/2\.5-flash/.test(model)) gen.thinkingConfig = { thinkingBudget: 0 };
+  } else {
+    var cc = JSON.parse(JSON.stringify(contents));
+    if (cc[0] && cc[0].parts && cc[0].parts[0]) cc[0].parts[0].text = '[CHỈ DẪN HỆ THỐNG]\n' + system + '\n\n' + cc[0].parts[0].text;
+    body.contents = cc;
   }
-  var body = { systemInstruction: { parts: [{ text: system }] }, contents: contents, generationConfig: gen };
+  var url, headers = { 'Content-Type': 'application/json' };
+  if (prov == 'kie'){
+    url = cfg.kieUrl.replace('{model}', encodeURIComponent(model));
+    headers['Authorization'] = 'Bearer ' + key;
+    body.stream = true;
+  } else {
+    url = 'https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(model) + ':streamGenerateContent?alt=sse';
+    headers['x-goog-api-key'] = key;
+  }
   var ctrl = new AbortController(); ABORT = ctrl;
   var total = setTimeout(function(){ ctrl.abort(); }, CONFIG.TIMEOUT_MS), stall = null;
   function kick(){ clearTimeout(stall); stall = setTimeout(function(){ ctrl.abort(); }, CONFIG.STALL_MS); }
   function done(){ clearTimeout(total); clearTimeout(stall); }
+  function mkErr(status, msg){
+    var e = new Error((status ? 'HTTP ' + status + ' — ' : '') + msg); e.status = status; e.kind = classify(status, msg);
+    if (e.kind == 'bad') e.kind = mode == 0 ? 'retryplain' : 'model';
+    return e;
+  }
   try {
     kick();
-    var res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(model) + ':streamGenerateContent?alt=sse', {
-      method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key }, body: JSON.stringify(body), signal: ctrl.signal });
+    var res = await fetch(url, { method: 'POST', headers: headers, body: JSON.stringify(body), signal: ctrl.signal });
     if (!res.ok){
       var et = await res.text().catch(function(){ return ''; });
-      var msg = (et.match(/"message":\s*"([^"]+)/) || [])[1] || et.slice(0, 200);
-      var e = new Error('HTTP ' + res.status + ' — ' + msg); e.status = res.status; e.kind = classify(res.status, msg);
-      if (res.status == 400 && /thinking/i.test(msg) && gen.thinkingConfig) e.kind = 'nothink';
-      throw e;
+      var ej = null; try { ej = JSON.parse(et); if (Array.isArray(ej)) ej = ej[0]; } catch(x){}
+      var pe = pickError(ej);
+      throw mkErr(res.status, pe ? pe.msg : (et.slice(0, 200) || res.statusText));
     }
-    var reader = res.body.getReader(), dec = new TextDecoder(), buf = '', got = '', finish = '', blockMsg = '';
+    var reader = res.body.getReader(), dec = new TextDecoder(), buf = '', raw = '', got = '', finish = '', sseSeen = false, inErr = null;
+    function handle(js){
+      var j; try { j = JSON.parse(js); } catch(x){ return; }
+      var pe2 = pickError(j); if (pe2){ inErr = pe2; return; }
+      var r = pickText(j); if (r.finish) finish = r.finish;
+      if (r.text){ got += r.text; onText(got); }
+    }
     while (true){
       var r = await reader.read(); if (r.done) break; kick();
-      buf += dec.decode(r.value, { stream: true });
-      var parts = buf.split('\n'); buf = parts.pop();
-      parts.forEach(function(line){
+      var chunk = dec.decode(r.value, { stream: true }); raw += chunk; buf += chunk;
+      var lines = buf.split('\n'); buf = lines.pop();
+      lines.forEach(function(line){
         line = line.trim(); if (line.indexOf('data:') != 0) return;
-        var js = line.slice(5).trim(); if (!js || js == '[DONE]') return;
-        try {
-          var j = JSON.parse(js);
-          if (j.error){ blockMsg = j.error.message || 'lỗi máy chủ'; return; }
-          var cand = j.candidates && j.candidates[0]; if (!cand) return;
-          if (cand.finishReason) finish = cand.finishReason;
-          ((cand.content && cand.content.parts) || []).forEach(function(pt){ if (pt.text && !pt.thought){ got += pt.text; onText(got); } });
-        } catch(err){}
+        sseSeen = true; var js = line.slice(5).trim(); if (js && js != '[DONE]') handle(js);
       });
     }
+    if (buf.trim().indexOf('data:') == 0){ sseSeen = true; handle(buf.trim().slice(5).trim()); }
     done();
-    if (!got){ var e2 = new Error(blockMsg || ('Máy chủ trả về rỗng' + (finish ? ' (' + finish + ')' : ''))); e2.kind = blockMsg ? classify(0, blockMsg) : 'other'; throw e2; }
+    if (!sseSeen && raw.trim()){
+      // Không phải SSE: có thể là mảng JSON hoặc một object (Kie hay trả HTTP 200 kèm {code,msg})
+      var all = null; try { all = JSON.parse(raw); } catch(x){}
+      (Array.isArray(all) ? all : [all]).forEach(function(j){ if (!j) return; var pe3 = pickError(j); if (pe3){ inErr = pe3; return; } var t = pickText(j); if (t.finish) finish = t.finish; got += t.text; });
+      if (got) onText(got);
+    }
+    if (!got){
+      if (inErr) throw mkErr(inErr.status, inErr.msg);
+      var e2 = new Error('Máy chủ trả về rỗng' + (finish ? ' (' + finish + ')' : '')); e2.kind = 'other'; throw e2;
+    }
     return { text: got, finish: finish };
   } catch(err){
     done();
     if (err.name == 'AbortError'){ var e3 = new Error(ctrl.userStop ? 'Đã dừng.' : 'Quá thời gian chờ phản hồi'); e3.kind = ctrl.userStop ? 'stop' : 'other'; throw e3; }
-    if (!err.kind){ err.kind = /Failed to fetch|NetworkError|Load failed/i.test(err.message) ? 'net' : 'other'; }
+    if (!err.kind) err.kind = /Failed to fetch|NetworkError|Load failed/i.test(err.message) ? 'net' : 'other';
     throw err;
   }
 }
-/* Vòng xoay: thử từng khóa (bỏ qua khóa đang nghỉ) × từng model */
+async function callAISmart(prov, key, model, system, contents, onText){
+  try { return await callAI(prov, key, model, system, contents, onText, 0); }
+  catch(e){ if (e.kind == 'retryplain'){ console.warn('[HUYEN-TUVI] thử lại kiểu tối giản', model, e.message); return await callAI(prov, key, model, system, contents, onText, 1); } throw e; }
+}
+/* Vòng xoay: tuyến chính → (khóa × model) → tuyến dự phòng */
 async function geminiStream(system, contents, onText, onNote){
-  var cfg = getCfg(), keys = cfg.keys, models = cfg.models;
-  if (!keys.length) throw new Error('Chưa có khóa Google AI Studio — vào ⚙ Cài đặt để thêm khóa.');
-  var kStart = lsGet('keyIdx', 0) % keys.length, mStart = lsGet('modelIdx', 0) % models.length;
-  var order = []; for (var i = 0; i < keys.length; i++) order.push((kStart + i) % keys.length);
-  var ready = order.filter(function(k){ return !coolOf(keys[k]); });
-  if (!ready.length) ready = order.slice(); // tất cả đang nghỉ → vẫn thử lại lần nữa
-  var lastErr = null, tried = 0;
-  for (var a = 0; a < ready.length; a++){
-    var ki = ready[a], key = keys[ki];
-    if (a > 0 && onNote) onNote('🔁 Chuyển sang khóa #' + (ki + 1));
-    for (var b = 0; b < models.length; b++){
-      var mi = (mStart + b) % models.length, model = models[mi];
-      try {
-        tried++;
-        var r;
-        try { r = await callGemini(key, model, system, contents, onText, false); }
-        catch(e0){ if (e0.kind == 'nothink') r = await callGemini(key, model, system, contents, onText, true); else throw e0; }
-        lsSet('keyIdx', ki); lsSet('modelIdx', mi); clearCool(key);
-        var st = lsGet('keyOk', {}); st[keyId(key)] = Date.now(); lsSet('keyOk', st);
-        console.log('[HUYEN-TUVI] OK khóa #' + (ki + 1), model, r.finish);
-        return r;
-      } catch(e){
-        lastErr = e; console.warn('[HUYEN-TUVI] khóa #' + (ki + 1), model, e.kind, e.message);
-        if (e.kind == 'stop' || e.kind == 'net') throw e;
-        if (e.kind == 'quota'){ setCool(key, CONFIG.QUOTA_COOLDOWN_MIN * 60000, 'Hết hạn mức'); break; }
-        if (e.kind == 'badkey'){ setCool(key, CONFIG.BADKEY_COOLDOWN_H * 3600000, 'Khóa sai / hết hạn'); break; }
-        // 'model' hoặc 'other' → thử model kế tiếp với cùng khóa
+  var cfg = getCfg(), provs = [cfg.provider];
+  var other = cfg.provider == 'kie' ? 'google' : 'kie';
+  if (cfg.backup && provKeys(cfg, other).length) provs.push(other);
+  if (!provKeys(cfg, cfg.provider).length && provKeys(cfg, other).length && provs.indexOf(other) < 0) provs.push(other);
+  var lastErr = null, anyKey = false, firstTry = true;
+  for (var pi = 0; pi < provs.length; pi++){
+    var prov = provs[pi], keys = provKeys(cfg, prov), models = provModels(cfg, prov);
+    if (!keys.length) continue; anyKey = true;
+    var kStart = lsGet('keyIdx-' + prov, 0) % keys.length, mStart = lsGet('modelIdx-' + prov, 0) % models.length;
+    var order = []; for (var i = 0; i < keys.length; i++) order.push((kStart + i) % keys.length);
+    var ready = order.filter(function(k){ return !coolOf(keys[k]); });
+    if (!ready.length) ready = order.slice();
+    for (var a = 0; a < ready.length; a++){
+      var ki = ready[a], key = keys[ki];
+      if (!firstTry && onNote) onNote(a == 0 && pi > 0 ? '🔁 Chuyển sang tuyến dự phòng' : '🔁 Chuyển sang khóa #' + (ki + 1));
+      for (var b = 0; b < models.length; b++){
+        var mi = (mStart + b) % models.length, model = models[mi];
+        firstTry = false;
+        try {
+          var r = await callAISmart(prov, key, model, system, contents, onText);
+          lsSet('keyIdx-' + prov, ki); lsSet('modelIdx-' + prov, mi); clearCool(key);
+          var st = lsGet('keyOk', {}); st[keyId(key)] = Date.now(); lsSet('keyOk', st);
+          console.log('[HUYEN-TUVI] OK', PROV_NAME[prov], 'khóa #' + (ki + 1), model, r.finish);
+          return r;
+        } catch(e){
+          lastErr = e; console.warn('[HUYEN-TUVI]', PROV_NAME[prov], 'khóa #' + (ki + 1), model, e.kind, e.message);
+          if (e.kind == 'stop') throw e;
+          if (e.kind == 'net') break;
+          if (e.kind == 'quota'){ setCool(key, CONFIG.QUOTA_COOLDOWN_MIN * 60000, 'Hết hạn mức'); break; }
+          if (e.kind == 'badkey'){ setCool(key, CONFIG.BADKEY_COOLDOWN_H * 3600000, 'Khóa sai / hết hạn'); break; }
+        }
       }
     }
   }
-  var err = new Error((keys.length > 1 ? 'Đã thử cả ' + keys.length + ' khóa nhưng chưa được. ' : '') + (lastErr ? lastErr.message : 'Không gọi được AI'));
-  err.kind = lastErr && lastErr.kind; throw err;
+  if (!anyKey) throw new Error('Chưa có khóa API — vào ⚙ Cài đặt để thêm khóa Kie.ai.');
+  var err = new Error('Đã thử hết các khóa nhưng chưa được. ' + (lastErr ? lastErr.message : '')); err.kind = lastErr && lastErr.kind; throw err;
 }
 function explainErr(e){
   var m = e.message || String(e);
-  if (/Failed to fetch|NetworkError/i.test(m)) return 'Không kết nối được máy chủ Google (mạng bị chặn hoặc mở bằng file:// trên một số trình duyệt). Hãy mở qua GitHub Pages / http.';
-  if (/401|403|UNAUTHENTICATED|credential|API key/i.test(m)) return 'Khóa Google AI Studio không hợp lệ hoặc đã hết hạn (khóa dạng "AQ." có thời hạn ngắn). Vào ⚙ Cài đặt dán khóa mới. Chi tiết: ' + m;
-  if (/429|quota|RESOURCE_EXHAUSTED/i.test(m)) return 'Tất cả khóa đều đang hết hạn mức. Thêm khóa mới trong ⚙ Cài đặt hoặc thử lại sau. Chi tiết: ' + m;
+  if (/Failed to fetch|NetworkError|Load failed/i.test(m)) return 'Không kết nối được máy chủ AI (mạng chặn, CORS, hoặc mở bằng file:// trên một số trình duyệt). Hãy mở qua GitHub Pages / https. Chi tiết: ' + m;
+  if (/401|403|UNAUTHENTICATED|unauthori|credential|API key|authentication/i.test(m)) return 'Khóa API không hợp lệ hoặc đã hết hạn. Vào ⚙ Cài đặt kiểm tra / thêm khóa. Chi tiết: ' + m;
+  if (/429|402|quota|RESOURCE_EXHAUSTED|credit|insufficient/i.test(m)) return 'Các khóa đang hết hạn mức / hết credit. Thêm khóa mới trong ⚙ Cài đặt hoặc thử lại sau. Chi tiết: ' + m;
   return m;
 }
 function addMsg(box, role, html){
@@ -1011,35 +1095,38 @@ async function fbReq(path, method, data){
     return await r.json();
   } catch(e){ clearTimeout(t); throw e.name == 'AbortError' ? new Error('Firebase quá thời gian chờ') : e; }
 }
+var FB_STATUS = ['Chưa cấu hình Firebase', null], FB_REMOTE_INFO = '';
+var KDELETED = {}, KADDED = {};   // khóa vừa xóa / vừa thêm trong phiên này
 function setFbStatus(t, ok){
   var col = ok ? 'var(--ok)' : ok === false ? 'var(--bad)' : 'var(--tx2)';
   var el = $('fbStat'); if (el){ el.textContent = t; el.style.color = col; }
   var bd = $('fbBadge'); if (bd){ bd.textContent = ok ? '☁️ Đã đồng bộ' : ok === false ? '☁️ Lỗi đồng bộ' : '☁️ …'; bd.style.color = col; bd.title = t; }
   FB_STATUS = [t, ok];
 }
-var KDELETED = {}, KADDED = {};   // khóa vừa bị xóa trong phiên này — không gộp lại từ Firebase
-var FB_REMOTE_INFO = '';
-var FB_STATUS = ['Chưa cấu hình Firebase', null];
+function cfgForRemote(c, now){
+  return { provider: c.provider, backup: c.backup, kieKeys: c.kieKeys, googleKeys: c.googleKeys, kieModels: c.kieModels, googleModels: c.googleModels,
+           kieUrl: c.kieUrl, think: c.think, temp: c.temp, updatedAt: now };
+}
+function mergeList(local, remote, remoteNewer){
+  remote = cleanList(remote).filter(function(k){ return !KDELETED[keyId(k)]; });
+  var out;
+  if (remoteNewer){ out = remote.slice(); local.forEach(function(k){ if (KADDED[keyId(k)] && out.indexOf(k) < 0) out.push(k); }); }
+  else { out = local.slice(); remote.forEach(function(k){ if (out.indexOf(k) < 0) out.push(k); }); }
+  return out;
+}
+/* Ghi cấu hình lên Firebase — luôn GỘP với danh sách khóa đang có để không máy nào làm mất khóa của máy khác */
 async function fbPushCfg(){
   if (!fbBase()) return;
-  var c = getCfg(), keys = c.keys.slice();
-  // Gộp với khóa đang có trên Firebase để máy này không bao giờ ghi đè làm MẤT khóa của máy khác
-  var rc = await fbReq('config');
-  if (rc && rc.keys){
-    var remote = rc.keys.map(cleanKey).filter(function(k){ return k && !KDELETED[keyId(k)]; });
-    if ((rc.updatedAt || 0) > (c.updatedAt || 0)){
-      // Máy khác đã sửa sau lần đồng bộ cuối của máy này → lấy Firebase làm gốc, chỉ thêm khóa máy này vừa thêm
-      keys = remote.slice();
-      c.keys.forEach(function(k){ if (KADDED[keyId(k)] && keys.indexOf(k) < 0) keys.push(k); });
-    } else {
-      remote.forEach(function(k){ if (keys.indexOf(k) < 0) keys.push(k); });
-    }
+  var c = getCfg(), rc = await fbReq('config');
+  if (rc){
+    var newer = (rc.updatedAt || 0) > (c.updatedAt || 0);
+    c.kieKeys = mergeList(c.kieKeys, rc.kieKeys, newer);
+    c.googleKeys = mergeList(c.googleKeys, rc.googleKeys || rc.keys, newer);
   }
   var now = Date.now();
-  await fbReq('config', 'PUT', { keys: keys, models: c.models, temp: c.temp, updatedAt: now });
-  c.keys = keys; c.updatedAt = now; saveCfg(c, true);
-  KADDED = {}; // đã đẩy lên xong, không cần nhớ nữa
-  FB_REMOTE_INFO = 'Trên Firebase: ' + keys.length + ' khóa · cập nhật ' + hhmm(now);
+  await fbReq('config', 'PUT', cfgForRemote(c, now));
+  c.updatedAt = now; saveCfg(c, true); KADDED = {};
+  FB_REMOTE_INFO = 'Trên Firebase: ' + c.kieKeys.length + ' khóa Kie + ' + c.googleKeys.length + ' khóa Google · ' + hhmm(now);
 }
 async function fbPushProfiles(){
   if (!fbBase()) return;
@@ -1049,47 +1136,68 @@ async function fbPushProfiles(){
 async function fbPullAll(){
   if (!fbBase()){ setFbStatus('Chưa cấu hình Firebase', null); return; }
   try {
+    // 1) Mật khẩu vào ứng dụng
+    var ra = await fbReq('auth'), la = lsGet('auth', null);
+    if (ra && ra.sha && (!la || (ra.updatedAt || 0) > (la.updatedAt || 0))){ lsSet('auth', ra); gateRecheck(); }
+    // 2) Cấu hình AI + khóa
     var rc = await fbReq('config'), local = getCfg();
-    if (rc && rc.keys && rc.keys.length && (rc.updatedAt || 0) >= (local.updatedAt || 0)){
-      // Firebase mới hơn (máy mới mở lần đầu luôn rơi vào đây) → lấy danh sách khóa trên Firebase
-      saveCfg({ keys: rc.keys.map(cleanKey).filter(Boolean), models: rc.models || local.models, temp: rc.temp != null ? rc.temp : local.temp, fbUrl: local.fbUrl, updatedAt: rc.updatedAt || 1 }, true);
-      FB_REMOTE_INFO = 'Trên Firebase: ' + rc.keys.length + ' khóa · cập nhật ' + hhmm(rc.updatedAt || Date.now());
-      console.log('[HUYEN-TUVI] nạp ' + rc.keys.length + ' khóa từ Firebase');
+    var rKie = cleanList(rc && rc.kieKeys), rGg = cleanList(rc && (rc.googleKeys || rc.keys));
+    if (rc && (rKie.length || rGg.length) && (rc.updatedAt || 0) >= (local.updatedAt || 0)){
+      saveCfg({ provider: rc.provider || local.provider, backup: rc.backup != null ? rc.backup : local.backup, kieKeys: rKie, googleKeys: rGg,
+        kieModels: rc.kieModels || local.kieModels, googleModels: rc.googleModels || rc.models || local.googleModels, kieUrl: rc.kieUrl || local.kieUrl,
+        think: rc.think || local.think, temp: rc.temp != null ? rc.temp : local.temp, fbUrl: local.fbUrl, updatedAt: rc.updatedAt || 1 }, true);
+      FB_REMOTE_INFO = 'Trên Firebase: ' + rKie.length + ' khóa Kie + ' + rGg.length + ' khóa Google · ' + hhmm(rc.updatedAt || Date.now());
     } else {
-      await fbPushCfg();   // máy này có thay đổi mới hơn hoặc Firebase còn trống → đẩy lên (có gộp, không ghi đè mất)
+      await fbPushCfg();
     }
+    // 3) Hồ sơ lá số
     var rp = await fbReq('profiles'), lpAt = lsGet('profilesAt', 0);
     if (rp && rp.list && (rp.updatedAt || 0) > lpAt){ lsSet('profiles', rp.list); lsSet('profilesAt', rp.updatedAt); renderProfiles(); }
     else if (lsGet('profiles', []).length && (!rp || lpAt > (rp.updatedAt || 0))) await fbPushProfiles();
     setFbStatus('✅ Đã kết nối Firebase · ' + hhmm(Date.now()) + (FB_REMOTE_INFO ? ' · ' + FB_REMOTE_INFO : ''), true);
   } catch(e){ setFbStatus('⚠️ ' + e.message, false); console.warn('[HUYEN-TUVI] Firebase', e); }
 }
-/* Lưu ngay khi thêm / xóa / đổi thứ tự khóa — không cần nhớ bấm 💾 */
-async function persistKeys(){
-  var c = getCfg(); c.keys = SKEYS.slice(); saveCfg(c, !!fbBase()); // có Firebase: giữ mốc đồng bộ cũ để biết máy khác có sửa sau không
-  if (lsGet('keyIdx', 0) >= SKEYS.length) lsSet('keyIdx', 0);
-  if (!fbBase()){ toast('Đã lưu trên máy (chưa cấu hình Firebase)'); return; }
-  setFbStatus('Đang ghi khóa lên Firebase…');
-  try { await fbPushCfg(); SKEYS = getCfg().keys.slice(); if ($('kCount')){ $('kCount').textContent = SKEYS.length; renderKeyList(); }
-        setFbStatus('✅ Đã lưu lên Firebase · ' + FB_REMOTE_INFO, true); toast('✅ Đã lưu khóa lên Firebase'); }
-  catch(e){ setFbStatus('⚠️ Khóa mới chỉ lưu trên máy này — Firebase lỗi: ' + e.message, false); toast('⚠️ Chưa lưu được lên Firebase'); }
-}
 
-/* ---------------- MẬT KHẨU CÀI ĐẶT ---------------- */
+/* ---------------- MẬT KHẨU ---------------- */
 function djb2(s){ var h = 5381; for (var i = 0; i < s.length; i++) h = ((h * 33) ^ s.charCodeAt(i)) >>> 0; return h; }
-async function checkPass(p){
-  try {
-    if (window.crypto && crypto.subtle){
-      var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(p));
-      return Array.from(new Uint8Array(buf)).map(function(b){ return b.toString(16).padStart(2, '0'); }).join('') === CONFIG.PASS_SHA256;
-    }
-  } catch(e){}
-  return djb2(p) === CONFIG.PASS_DJB2;
+async function sha256(p){
+  try { if (window.crypto && crypto.subtle){ var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(p));
+    return Array.from(new Uint8Array(buf)).map(function(b){ return b.toString(16).padStart(2, '0'); }).join(''); } } catch(e){}
+  return null;
 }
+async function hashPass(p){ return { sha: await sha256(p), djb: djb2(p) }; }
+function sameHash(h, ref){ return (h.sha && ref.sha) ? h.sha === ref.sha : h.djb === ref.djb; }
+/* Mật khẩu QUẢN TRỊ (mở Cài đặt) — cố định trong file */
+async function checkPass(p){ return sameHash(await hashPass(p), { sha: CONFIG.PASS_SHA256, djb: CONFIG.PASS_DJB2 }); }
 function isUnlocked(){ try { return sessionStorage.getItem(LS + '-unlock') == '1'; } catch(e){ return false; } }
+/* Mật khẩu VÀO ỨNG DỤNG — mặc định trong file, đổi được và lưu Firebase /auth */
+function loginRef(){ var a = lsGet('auth', null); return a && (a.sha || a.djb) ? a : { sha: CONFIG.LOGIN_SHA256, djb: CONFIG.LOGIN_DJB2, updatedAt: 0 }; }
+function loginTok(){ var t = lsGet('loginTok', null); if (!t){ try { t = JSON.parse(sessionStorage.getItem(LS + '-loginTok') || 'null'); } catch(e){} } return t; }
+function gateRecheck(msg){
+  var t = loginTok(), ok = t && sameHash(t, loginRef());
+  $('gate').style.display = ok ? 'none' : 'flex';
+  document.body.style.overflow = ok ? '' : 'hidden';
+  if (!ok && msg) $('gMsg').textContent = msg;
+  else if (!ok && t) $('gMsg').textContent = 'Mật khẩu đã được đổi — vui lòng nhập mật khẩu mới.';
+  if (!ok) setTimeout(function(){ var p = $('gPass'); if (p) p.focus(); }, 60);
+  return ok;
+}
+async function gateLogin(){
+  var p = $('gPass').value; if (!p){ $('gMsg').textContent = 'Vui lòng nhập mật khẩu'; return; }
+  var h = await hashPass(p);
+  if (sameHash(h, loginRef())){
+    if ($('gRemember').checked){ lsSet('loginTok', h); } else { try { localStorage.removeItem(LS + '-loginTok'); sessionStorage.setItem(LS + '-loginTok', JSON.stringify(h)); } catch(e){} }
+    $('gPass').value = ''; $('gMsg').textContent = ''; gateRecheck();
+  } else { $('gMsg').textContent = '❌ Sai mật khẩu'; $('gPass').select(); }
+}
+$('gBtn').onclick = gateLogin;
+$('gPass').addEventListener('keydown', function(e){ if (e.key == 'Enter') gateLogin(); });
+$('gEye').onclick = function(){ var p = $('gPass'); p.type = p.type == 'password' ? 'text' : 'password'; this.textContent = p.type == 'password' ? '👁' : '🙈'; };
+function logout(){ try { localStorage.removeItem(LS + '-loginTok'); sessionStorage.removeItem(LS + '-loginTok'); sessionStorage.removeItem(LS + '-unlock'); } catch(e){} closeModal(); gateRecheck(' '); }
+
 $('btnSet').onclick = function(){
   if (isUnlocked()){ openSettings(); return; }
-  openModal('<h2>🔒 Cài đặt được bảo vệ</h2><label>Mật khẩu quản trị</label><input id="pw" type="password" autocomplete="current-password">' +
+  openModal('<h2>🔒 Cài đặt quản trị</h2><label>Mật khẩu quản trị</label><input id="pw" type="password" autocomplete="current-password">' +
     '<div class="row" style="margin-top:12px"><button class="btn pri" id="pwOk">Mở khóa</button><span class="muted" id="pwMsg"></span></div>');
   var go2 = async function(){
     if (await checkPass($('pw').value)){ try { sessionStorage.setItem(LS + '-unlock', '1'); } catch(e){} openSettings(); }
@@ -1100,84 +1208,129 @@ $('btnSet').onclick = function(){
 };
 
 /* ---------------- CÀI ĐẶT ---------------- */
-var SKEYS = [];
-function renderKeyList(){
-  var cur = lsGet('keyIdx', 0), ok = lsGet('keyOk', {});
-  $('keyList').innerHTML = SKEYS.length ? SKEYS.map(function(k, i){
+var SKEYS = { kie: [], google: [] };
+function renderKeyList(prov){
+  var el = $('keyList-' + prov); if (!el) return;
+  var list = SKEYS[prov], cur = lsGet('keyIdx-' + prov, 0), ok = lsGet('keyOk', {});
+  $('kCount-' + prov).textContent = list.length;
+  el.innerHTML = list.length ? list.map(function(k, i){
     var c = coolOf(k), st = c ? '<span class="neg">' + (c.why == 'Hết hạn mức' ? '⏳ Hết hạn mức, thử lại sau ' : '⛔ ' + c.why + ' · thử lại sau ') + hhmm(c.until) + '</span>'
-      : (i == cur % SKEYS.length ? '<span class="pos">★ Đang dùng</span>' : '<span class="muted">Sẵn sàng</span>');
+      : (i == cur % list.length ? '<span class="pos">★ Đang dùng</span>' : '<span class="muted">Sẵn sàng</span>');
     var last = ok[keyId(k)] ? '<span class="muted"> · chạy tốt lần cuối ' + hhmm(ok[keyId(k)]) + '</span>' : '';
-    return '<div class="prof"><div><b>#' + (i + 1) + '</b> <code>' + esc(maskKey(k)) + '</code> <span class="muted">(' + k.length + ' ký tự)</span><br>' + st + last + '<div class="muted" id="kt' + i + '"></div></div>' +
-      '<div class="row"><button class="btn" data-ku="' + i + '" title="Ưu tiên lên trên">▲</button><button class="btn" data-kt="' + i + '" title="Kiểm tra khóa">🩺</button>' +
-      (c ? '<button class="btn" data-kr="' + i + '" title="Bỏ trạng thái nghỉ">↺</button>' : '') + '<button class="btn" data-kd="' + i + '" title="Xóa">🗑</button></div></div>';
+    return '<div class="prof"><div><b>#' + (i + 1) + '</b> <code>' + esc(maskKey(k)) + '</code> <span class="muted">(' + k.length + ' ký tự)</span><br>' + st + last + '<div class="muted" id="kt-' + prov + i + '"></div></div>' +
+      '<div class="row"><button class="btn" data-p="' + prov + '" data-ku="' + i + '" title="Ưu tiên lên trên">▲</button><button class="btn" data-p="' + prov + '" data-kt="' + i + '" title="Kiểm tra khóa">🩺</button>' +
+      (c ? '<button class="btn" data-p="' + prov + '" data-kr="' + i + '" title="Bỏ trạng thái nghỉ">↺</button>' : '') + '<button class="btn" data-p="' + prov + '" data-kd="' + i + '" title="Xóa">🗑</button></div></div>';
   }).join('') : '<p class="muted">Chưa có khóa nào.</p>';
 }
+function keyBlock(prov, hint){
+  return '<h3>🔑 Khóa ' + PROV_NAME[prov] + ' (<span id="kCount-' + prov + '">0</span>)</h3><div id="keyList-' + prov + '"></div>' +
+    '<textarea id="kNew-' + prov + '" rows="2" placeholder="' + hint + '" style="margin-top:6px"></textarea>' +
+    '<div class="row" style="margin-top:6px"><button class="btn" data-add="' + prov + '">➕ Thêm khóa ' + PROV_NAME[prov] + '</button><button class="btn" data-testall="' + prov + '">🩺 Kiểm tra tất cả</button></div>';
+}
+function readModels(prov){ var el = $('sModels-' + prov); return el ? el.value.split(/\n|,/).map(function(x){ return x.trim(); }).filter(Boolean) : []; }
 function openSettings(){
-  var c = getCfg(); SKEYS = c.keys.slice();
-  openModal('<h2>⚙ Cài đặt AI &amp; đồng bộ</h2>' +
-    '<h3>🔑 Khóa Google AI Studio (' + '<span id="kCount">' + SKEYS.length + '</span>)</h3>' +
-    '<p class="muted">Thêm / xóa / đổi thứ tự là tự lưu lên Firebase ngay. Thứ tự từ trên xuống. Khóa nào hết hạn mức (HTTP 429) sẽ tạm nghỉ ' + CONFIG.QUOTA_COOLDOWN_MIN + ' phút và Huyền tự chuyển sang khóa kế tiếp; khóa sai/hết hạn nghỉ ' + CONFIG.BADKEY_COOLDOWN_H + ' giờ.</p>' +
-    '<div id="keyList"></div>' +
-    '<label style="margin-top:8px">Thêm khóa (dán nhiều khóa, mỗi dòng một khóa)</label><textarea id="kNew" rows="2" placeholder="AQ.… hoặc AIza…"></textarea>' +
-    '<div class="row" style="margin-top:6px"><button class="btn" id="kAdd">➕ Thêm khóa</button><button class="btn" id="kTestAll">🩺 Kiểm tra tất cả</button><button class="btn" id="kClearCool">↺ Bỏ nghỉ tất cả</button></div>' +
-    '<h3>🧠 Model</h3><label>Chuỗi model (mỗi dòng một model — model đầu là chính, lỗi thì tự tụt)</label><textarea id="sModels" rows="3">' + esc(c.models.join('\n')) + '</textarea>' +
+  var c = getCfg(); SKEYS = { kie: c.kieKeys.slice(), google: c.googleKeys.slice() };
+  openModal('<h2>⚙ Cài đặt quản trị</h2>' +
+    '<h3>🔀 Tuyến AI</h3><div class="grid2"><div><label>Tuyến chính</label><select id="sProv"><option value="kie">Kie.ai</option><option value="google">Google AI Studio</option></select></div>' +
+    '<div><label>Mức suy luận (cao = kỹ hơn nhưng chậm hơn)</label><select id="sThink"><option value="low">Thấp — nhanh</option><option value="medium">Vừa</option><option value="high">Cao — kỹ nhất</option></select></div></div>' +
+    '<label style="display:flex;gap:6px;align-items:center;margin-top:8px"><input type="checkbox" id="sBackup" style="width:auto"> Hết khóa tuyến chính thì tự dùng tuyến còn lại</label>' +
+    '<p class="muted">Thêm / xóa / đổi thứ tự khóa là tự lưu lên Firebase ngay. Khóa hết hạn mức nghỉ ' + CONFIG.QUOTA_COOLDOWN_MIN + ' phút, khóa sai nghỉ ' + CONFIG.BADKEY_COOLDOWN_H + ' giờ, Huyền tự chuyển khóa kế tiếp.</p>' +
+    keyBlock('kie', 'Dán khóa API Kie.ai (mỗi dòng một khóa)') +
+    '<label style="margin-top:10px">Endpoint Kie.ai ({model} sẽ được thay bằng tên model)</label><input id="sKieUrl" value="' + esc(c.kieUrl) + '">' +
+    '<label style="margin-top:8px">Model Kie.ai (mỗi dòng một model — lỗi thì tự tụt)</label><textarea id="sModels-kie" rows="2">' + esc(c.kieModels.join('\n')) + '</textarea>' +
+    keyBlock('google', 'AQ.… hoặc AIza… (mỗi dòng một khóa)') +
+    '<label style="margin-top:8px">Model Google AI Studio</label><textarea id="sModels-google" rows="3">' + esc(c.googleModels.join('\n')) + '</textarea>' +
     '<label style="margin-top:10px">Độ sáng tạo (0–1.5): <b id="sTv">' + c.temp + '</b></label><input id="sTemp" type="range" min="0" max="1.5" step="0.1" value="' + c.temp + '">' +
-    '<h3>☁️ Firebase Realtime Database</h3><label>databaseURL (ví dụ https://ten-du-an-default-rtdb.firebaseio.com)</label><input id="sFb" value="' + esc(c.fbUrl) + '" placeholder="https://…firebaseio.com">' +
-    '<p class="muted" id="fbStat"></p><p class="muted">Đồng bộ khóa, model và hồ sơ lá số ở nhánh /' + CONFIG.FB_NODE + ' cho mọi máy dùng chung.</p>' +
-    '<div class="row" style="margin-top:14px"><button class="btn pri" id="sSave">💾 Lưu &amp; đồng bộ</button><button class="btn" id="sPull">⟳ Tải từ Firebase</button><button class="btn" id="sLock">🔒 Khóa cài đặt</button><button class="btn" id="sReset">↺ Mặc định</button></div>' +
+    '<h3>🔐 Mật khẩu vào ứng dụng</h3><p class="muted">Mọi máy đều dùng chung mật khẩu này (lưu trên Firebase). Đổi xong, các máy đang đăng nhập bằng mật khẩu cũ sẽ phải nhập lại.</p>' +
+    '<div class="grid2"><div><label>Mật khẩu mới</label><input id="sNewPass" type="password" autocomplete="new-password"></div><div><label>Nhập lại mật khẩu mới</label><input id="sNewPass2" type="password" autocomplete="new-password"></div></div>' +
+    '<div class="row" style="margin-top:8px"><button class="btn gold" id="sPassSave">💾 Lưu mật khẩu lên Firebase</button><span class="muted" id="sPassMsg"></span></div>' +
+    '<h3>☁️ Firebase Realtime Database</h3><label>databaseURL</label><input id="sFb" value="' + esc(c.fbUrl) + '">' +
+    '<p class="muted" id="fbStat"></p>' +
+    '<div class="row" style="margin-top:14px"><button class="btn pri" id="sSave">💾 Lưu &amp; đồng bộ</button><button class="btn" id="sPull">⟳ Tải từ Firebase</button><button class="btn" id="kClearCool">↺ Bỏ nghỉ mọi khóa</button><button class="btn" id="sLock">🔒 Khóa cài đặt</button><button class="btn" id="sLogout">🚪 Đăng xuất app</button></div>' +
     '<pre id="sOut" class="muted" style="white-space:pre-wrap;margin-top:10px"></pre><p class="muted">Bản dựng ' + CONFIG.BUILD + '</p>');
+  $('sProv').value = c.provider; $('sThink').value = c.think; $('sBackup').checked = !!c.backup;
   setFbStatus(FB_STATUS[0], FB_STATUS[1]);
-  renderKeyList();
-  if (fbBase()) fbPullAll().then(function(){ if ($('keyList')){ SKEYS = getCfg().keys.slice(); $('kCount').textContent = SKEYS.length; renderKeyList(); } });
+  PROVS.forEach(renderKeyList);
+  if (fbBase()) fbPullAll().then(function(){ if ($('keyList-kie')){ var c2 = getCfg(); SKEYS = { kie: c2.kieKeys.slice(), google: c2.googleKeys.slice() }; PROVS.forEach(renderKeyList); } });
   $('sTemp').oninput = function(){ $('sTv').textContent = this.value; };
-  $('keyList').onclick = async function(e){
+  $('mbody').onclick = async function(e){
     var b = e.target.closest('button'); if (!b) return;
-    var changed = false;
-    if (b.dataset.kd != null){ if (!confirm('Xóa khóa #' + (+b.dataset.kd + 1) + '?')) return; KDELETED[keyId(SKEYS[+b.dataset.kd])] = 1; SKEYS.splice(+b.dataset.kd, 1); changed = true; }
-    else if (b.dataset.ku != null){ var i = +b.dataset.ku; if (i > 0){ var t = SKEYS[i]; SKEYS[i] = SKEYS[i - 1]; SKEYS[i - 1] = t; changed = true; } }
-    else if (b.dataset.kr != null){ clearCool(SKEYS[+b.dataset.kr]); }
-    else if (b.dataset.kt != null){ await testKey(+b.dataset.kt); return; }
-    $('kCount').textContent = SKEYS.length; renderKeyList();
+    var p = b.dataset.p || b.dataset.add || b.dataset.testall; if (!p) return;
+    var list = SKEYS[p], changed = false;
+    if (b.dataset.add){
+      var add = $('kNew-' + p).value.split(/[\n,;]+/).map(cleanKey).filter(function(k){ return k.length > 10 && list.indexOf(k) < 0; });
+      if (!add.length){ toast('Không có khóa mới hợp lệ'); return; }
+      add.forEach(function(k){ list.push(k); delete KDELETED[keyId(k)]; KADDED[keyId(k)] = 1; }); $('kNew-' + p).value = ''; changed = true;
+    }
+    else if (b.dataset.testall){ for (var i = 0; i < list.length; i++) await testKey(p, i); return; }
+    else if (b.dataset.kd != null){ if (!confirm('Xóa khóa #' + (+b.dataset.kd + 1) + '?')) return; KDELETED[keyId(list[+b.dataset.kd])] = 1; list.splice(+b.dataset.kd, 1); changed = true; }
+    else if (b.dataset.ku != null){ var k = +b.dataset.ku; if (k > 0){ var t = list[k]; list[k] = list[k - 1]; list[k - 1] = t; changed = true; } }
+    else if (b.dataset.kr != null){ clearCool(list[+b.dataset.kr]); }
+    else if (b.dataset.kt != null){ await testKey(p, +b.dataset.kt); return; }
+    renderKeyList(p);
     if (changed) persistKeys();
   };
-  $('kAdd').onclick = function(){
-    var add = $('kNew').value.split(/[\n,;]+/).map(cleanKey).filter(function(k){ return k.length > 10 && SKEYS.indexOf(k) < 0; });
-    if (!add.length){ toast('Không có khóa mới hợp lệ'); return; }
-    SKEYS = SKEYS.concat(add); add.forEach(function(k){ delete KDELETED[keyId(k)]; KADDED[keyId(k)] = 1; }); $('kNew').value = ''; $('kCount').textContent = SKEYS.length; renderKeyList(); persistKeys();
-  };
-  $('kTestAll').onclick = async function(){ for (var i = 0; i < SKEYS.length; i++) await testKey(i); };
-  $('kClearCool').onclick = function(){ clearCool(); renderKeyList(); toast('Đã bỏ trạng thái nghỉ của mọi khóa'); };
+  $('kClearCool').onclick = function(){ clearCool(); PROVS.forEach(renderKeyList); toast('Đã bỏ trạng thái nghỉ của mọi khóa'); };
   $('sSave').onclick = async function(){
-    var models = $('sModels').value.split(/\n|,/).map(function(x){ return x.trim(); }).filter(Boolean);
-    if (!SKEYS.length){ toast('Cần ít nhất 1 khóa'); return; }
-    saveCfg({ keys: SKEYS.slice(), models: models.length ? models : CONFIG.MODELS.slice(), temp: +$('sTemp').value, fbUrl: $('sFb').value.trim() });
-    lsSet('modelIdx', 0); if (lsGet('keyIdx', 0) >= SKEYS.length) lsSet('keyIdx', 0);
+    var c3 = collectSettings(); saveCfg(c3);
+    PROVS.forEach(function(p){ lsSet('modelIdx-' + p, 0); });
     if (fbBase()){
       setFbStatus('Đang ghi lên Firebase…');
-      try { await fbPushCfg(); await fbPushProfiles(); setFbStatus('✅ Đã lưu & đồng bộ Firebase · ' + hhmm(Date.now()), true); toast('Đã lưu & đồng bộ'); }
-      catch(e){ setFbStatus('⚠️ Lưu trên máy được, nhưng Firebase lỗi: ' + e.message, false); }
+      try { await fbPushCfg(); await fbPushProfiles(); setFbStatus('✅ Đã lưu & đồng bộ · ' + FB_REMOTE_INFO, true); toast('Đã lưu & đồng bộ Firebase'); }
+      catch(err){ setFbStatus('⚠️ Lưu trên máy được, nhưng Firebase lỗi: ' + err.message, false); }
     } else toast('Đã lưu trên máy này');
   };
   $('sPull').onclick = async function(){
-    saveCfg(Object.assign(getCfg(), { fbUrl: $('sFb').value.trim() }), true);
-    setFbStatus('Đang tải…'); await fbPullAll(); var c2 = getCfg(); SKEYS = c2.keys.slice(); $('kCount').textContent = SKEYS.length; $('sModels').value = c2.models.join('\n'); renderKeyList();
+    var c4 = getCfg(); c4.fbUrl = $('sFb').value.trim(); saveCfg(c4, true);
+    setFbStatus('Đang tải…'); await fbPullAll(); openSettings();
+  };
+  $('sPassSave').onclick = async function(){
+    var a = $('sNewPass').value, b2 = $('sNewPass2').value, msg = $('sPassMsg');
+    if (a.length < 4){ msg.textContent = '❌ Mật khẩu tối thiểu 4 ký tự'; return; }
+    if (a !== b2){ msg.textContent = '❌ Hai lần nhập không khớp'; return; }
+    if (!fbBase()){ msg.textContent = '❌ Chưa cấu hình Firebase'; return; }
+    var h = await hashPass(a), rec = { sha: h.sha, djb: h.djb, updatedAt: Date.now() };
+    if (!rec.sha){ msg.textContent = '⚠️ Trình duyệt này không hỗ trợ mã hóa SHA-256 — hãy đổi trên Chrome/Edge qua https'; return; }
+    msg.textContent = 'Đang lưu…';
+    try { await fbReq('auth', 'PUT', rec); lsSet('auth', rec); lsSet('loginTok', h); $('sNewPass').value = $('sNewPass2').value = '';
+          msg.innerHTML = '<span class="pos">✅ Đã lưu mật khẩu mới lên Firebase · ' + hhmm(rec.updatedAt) + '</span>'; toast('Đã đổi mật khẩu vào ứng dụng'); }
+    catch(err){ msg.innerHTML = '<span class="neg">❌ Chưa lưu được: ' + esc(err.message) + '</span>'; }
   };
   $('sLock').onclick = function(){ try { sessionStorage.removeItem(LS + '-unlock'); } catch(e){} closeModal(); toast('Đã khóa cài đặt'); };
-  $('sReset').onclick = function(){ if (!confirm('Đưa khóa & model về mặc định trong file?')) return; var fb = getCfg().fbUrl; saveCfg({ keys: CONFIG.GEMINI_KEYS.slice(), models: CONFIG.MODELS.slice(), temp: CONFIG.TEMPERATURE, fbUrl: fb }); lsSet('modelIdx', 0); lsSet('keyIdx', 0); openSettings(); };
+  $('sLogout').onclick = logout;
 }
-async function testKey(i){
-  var k = SKEYS[i], el = $('kt' + i); if (!el) return;
+function collectSettings(){
+  var c = getCfg();
+  c.provider = $('sProv').value; c.think = $('sThink').value; c.backup = $('sBackup').checked;
+  c.kieKeys = SKEYS.kie.slice(); c.googleKeys = SKEYS.google.slice();
+  var km = readModels('kie'), gm = readModels('google');
+  c.kieModels = km.length ? km : CONFIG.KIE_MODELS.slice(); c.googleModels = gm.length ? gm : CONFIG.GOOGLE_MODELS.slice();
+  c.kieUrl = $('sKieUrl').value.trim() || CONFIG.KIE_URL; c.temp = +$('sTemp').value; c.fbUrl = $('sFb').value.trim();
+  return c;
+}
+/* Lưu ngay khi thêm / xóa / đổi thứ tự khóa */
+async function persistKeys(){
+  var c = getCfg(); c.kieKeys = SKEYS.kie.slice(); c.googleKeys = SKEYS.google.slice(); saveCfg(c, !!fbBase());
+  PROVS.forEach(function(p){ if (lsGet('keyIdx-' + p, 0) >= SKEYS[p].length) lsSet('keyIdx-' + p, 0); });
+  if (!fbBase()){ toast('Đã lưu trên máy (chưa cấu hình Firebase)'); return; }
+  setFbStatus('Đang ghi khóa lên Firebase…');
+  try { await fbPushCfg(); var c2 = getCfg(); SKEYS = { kie: c2.kieKeys.slice(), google: c2.googleKeys.slice() }; PROVS.forEach(renderKeyList);
+        setFbStatus('✅ Đã lưu lên Firebase · ' + FB_REMOTE_INFO, true); toast('✅ Đã lưu khóa lên Firebase'); }
+  catch(e){ setFbStatus('⚠️ Khóa mới chỉ lưu trên máy này — Firebase lỗi: ' + e.message, false); toast('⚠️ Chưa lưu được lên Firebase'); }
+}
+async function testKey(prov, i){
+  var k = SKEYS[prov][i], el = $('kt-' + prov + i); if (!el) return;
   el.textContent = '🩺 Đang thử…';
-  var models = $('sModels').value.split(/\n|,/).map(function(x){ return x.trim(); }).filter(Boolean), log = [];
+  var models = readModels(prov), log = [];
+  if (prov == 'kie'){ var u = $('sKieUrl').value.trim(); if (u){ var c = getCfg(); c.kieUrl = u; saveCfg(c, true); } }
   for (var m = 0; m < models.length; m++){
     try {
-      await callGemini(k, models[m], 'Trả lời đúng một từ.', [{ role: 'user', parts: [{ text: 'Chào' }] }], function(){}, false)
-        .catch(function(e){ if (e.kind == 'nothink') return callGemini(k, models[m], 'Trả lời đúng một từ.', [{ role: 'user', parts: [{ text: 'Chào' }] }], function(){}, true); throw e; });
+      await callAISmart(prov, k, models[m], 'Trả lời đúng một câu ngắn.', [{ role: 'user', parts: [{ text: 'Chào Huyền' }] }], function(){});
       clearCool(k); var st = lsGet('keyOk', {}); st[keyId(k)] = Date.now(); lsSet('keyOk', st);
       el.innerHTML = '<span class="pos">✅ Chạy tốt với ' + esc(models[m]) + '</span>' + (log.length ? ' <span class="muted">(' + esc(log.join('; ')) + ')</span>' : '');
       return;
     } catch(e){
-      log.push(models[m] + ': ' + e.message.slice(0, 90));
+      log.push(models[m] + ': ' + e.message.slice(0, 120));
       if (e.kind == 'quota' || e.kind == 'badkey' || e.kind == 'net') break;
     }
   }
@@ -1188,6 +1341,7 @@ async function testKey(i){
 (function(){
   var last = lsGet('last', null);
   if (last){ fillForm(last); }
+  gateRecheck();
   fbPullAll();
   document.addEventListener('keydown', function(e){ if (e.key == 'Escape') closeModal(); });
 })();
