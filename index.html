@@ -114,17 +114,17 @@ textarea{resize:vertical}
 @media(max-width:640px){.hwrap{gap:8px}nav{margin-left:0}nav button{padding:7px 10px;font-size:13px}.card{padding:14px}}
 </style>
 
-    <link rel="manifest" href="./manifest.json?v=3-d20a48f3-e8e802e4">
-    <link rel="icon" href="./ideco-icon-192.png?v=3-d20a48f3-e8e802e4" type="image/png">
-    <link rel="apple-touch-icon" sizes="180x180" href="./ideco-apple-touch-icon.png?v=3-d20a48f3-e8e802e4">
+    <link rel="manifest" href="./manifest.json?v=3-d20a48f3-48bddde5">
+    <link rel="icon" href="./ideco-icon-192.png?v=3-d20a48f3-48bddde5" type="image/png">
+    <link rel="apple-touch-icon" sizes="180x180" href="./ideco-apple-touch-icon.png?v=3-d20a48f3-48bddde5">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-title" content="XEM TỬ VI">
-    <script src="./ideco-pwa.js?v=3-d20a48f3-e8e802e4" defer=""></script>
+    <meta name="apple-mobile-web-app-title" content="TỬ VI">
+    <script src="./ideco-pwa.js?v=3-d20a48f3-48bddde5" defer=""></script>
   </head>
 <body>
 <header><div class="hwrap">
-  <div class="logo"><div class="ic">⛵</div><div><b>HUYỀN · TỬ VI AI</b><small>IDECO — lập lá số &amp; luận giải thông minh</small></div></div>
+  <div class="logo"><div class="ic">⛵</div><div><b>HUYỀN · TỬ VI AI</b><small>IDECO — lập lá số &amp; luận giải thông minh · <span id="fbBadge" title="Trạng thái đồng bộ Firebase">☁️ …</span></small></div></div>
   <nav>
     <button data-v="lap" class="on">🔮 Lập lá số</button>
     <button data-v="hop">💞 Xem hợp</button>
@@ -241,7 +241,7 @@ textarea{resize:vertical}
    HUYỀN · TỬ VI AI — IDECO   (BUILD 20261108-1)
    ===================================================================== */
 var CONFIG = {
-  BUILD: '20261108-4',
+  BUILD: '20261109-1',
   // Danh sách khóa Google AI Studio mặc định (thêm/bớt trong ⚙ Cài đặt). Hết hạn mức → tự chuyển khóa kế tiếp.
   GEMINI_KEYS: ['AQ.Ab8RN6LDYxbCHgiTMb2DLgtyVqpeb00y1Dp7sdpu-Xoglk3NIg'],
   // Chuỗi model: model đầu là model chính; tên sai / chưa mở thì tự tụt model kế tiếp
@@ -1011,11 +1011,35 @@ async function fbReq(path, method, data){
     return await r.json();
   } catch(e){ clearTimeout(t); throw e.name == 'AbortError' ? new Error('Firebase quá thời gian chờ') : e; }
 }
-function setFbStatus(t, ok){ var el = $('fbStat'); if (el){ el.textContent = t; el.style.color = ok ? 'var(--ok)' : ok === false ? 'var(--bad)' : 'var(--tx2)'; } FB_STATUS = [t, ok]; }
+function setFbStatus(t, ok){
+  var col = ok ? 'var(--ok)' : ok === false ? 'var(--bad)' : 'var(--tx2)';
+  var el = $('fbStat'); if (el){ el.textContent = t; el.style.color = col; }
+  var bd = $('fbBadge'); if (bd){ bd.textContent = ok ? '☁️ Đã đồng bộ' : ok === false ? '☁️ Lỗi đồng bộ' : '☁️ …'; bd.style.color = col; bd.title = t; }
+  FB_STATUS = [t, ok];
+}
+var KDELETED = {}, KADDED = {};   // khóa vừa bị xóa trong phiên này — không gộp lại từ Firebase
+var FB_REMOTE_INFO = '';
 var FB_STATUS = ['Chưa cấu hình Firebase', null];
 async function fbPushCfg(){
-  var c = getCfg(); if (!fbBase()) return;
-  await fbReq('config', 'PUT', { keys: c.keys, models: c.models, temp: c.temp, updatedAt: c.updatedAt || Date.now() });
+  if (!fbBase()) return;
+  var c = getCfg(), keys = c.keys.slice();
+  // Gộp với khóa đang có trên Firebase để máy này không bao giờ ghi đè làm MẤT khóa của máy khác
+  var rc = await fbReq('config');
+  if (rc && rc.keys){
+    var remote = rc.keys.map(cleanKey).filter(function(k){ return k && !KDELETED[keyId(k)]; });
+    if ((rc.updatedAt || 0) > (c.updatedAt || 0)){
+      // Máy khác đã sửa sau lần đồng bộ cuối của máy này → lấy Firebase làm gốc, chỉ thêm khóa máy này vừa thêm
+      keys = remote.slice();
+      c.keys.forEach(function(k){ if (KADDED[keyId(k)] && keys.indexOf(k) < 0) keys.push(k); });
+    } else {
+      remote.forEach(function(k){ if (keys.indexOf(k) < 0) keys.push(k); });
+    }
+  }
+  var now = Date.now();
+  await fbReq('config', 'PUT', { keys: keys, models: c.models, temp: c.temp, updatedAt: now });
+  c.keys = keys; c.updatedAt = now; saveCfg(c, true);
+  KADDED = {}; // đã đẩy lên xong, không cần nhớ nữa
+  FB_REMOTE_INFO = 'Trên Firebase: ' + keys.length + ' khóa · cập nhật ' + hhmm(now);
 }
 async function fbPushProfiles(){
   if (!fbBase()) return;
@@ -1026,15 +1050,29 @@ async function fbPullAll(){
   if (!fbBase()){ setFbStatus('Chưa cấu hình Firebase', null); return; }
   try {
     var rc = await fbReq('config'), local = getCfg();
-    if (rc && rc.keys && (rc.updatedAt || 0) > (local.updatedAt || 0)){
-      saveCfg({ keys: rc.keys, models: rc.models || local.models, temp: rc.temp != null ? rc.temp : local.temp, fbUrl: local.fbUrl, updatedAt: rc.updatedAt }, true);
-      console.log('[HUYEN-TUVI] nạp cấu hình từ Firebase');
-    } else if (!rc || (local.updatedAt || 0) > (rc.updatedAt || 0)) { await fbPushCfg(); }
+    if (rc && rc.keys && rc.keys.length && (rc.updatedAt || 0) >= (local.updatedAt || 0)){
+      // Firebase mới hơn (máy mới mở lần đầu luôn rơi vào đây) → lấy danh sách khóa trên Firebase
+      saveCfg({ keys: rc.keys.map(cleanKey).filter(Boolean), models: rc.models || local.models, temp: rc.temp != null ? rc.temp : local.temp, fbUrl: local.fbUrl, updatedAt: rc.updatedAt || 1 }, true);
+      FB_REMOTE_INFO = 'Trên Firebase: ' + rc.keys.length + ' khóa · cập nhật ' + hhmm(rc.updatedAt || Date.now());
+      console.log('[HUYEN-TUVI] nạp ' + rc.keys.length + ' khóa từ Firebase');
+    } else {
+      await fbPushCfg();   // máy này có thay đổi mới hơn hoặc Firebase còn trống → đẩy lên (có gộp, không ghi đè mất)
+    }
     var rp = await fbReq('profiles'), lpAt = lsGet('profilesAt', 0);
     if (rp && rp.list && (rp.updatedAt || 0) > lpAt){ lsSet('profiles', rp.list); lsSet('profilesAt', rp.updatedAt); renderProfiles(); }
     else if (lsGet('profiles', []).length && (!rp || lpAt > (rp.updatedAt || 0))) await fbPushProfiles();
-    setFbStatus('✅ Đã kết nối Firebase · ' + hhmm(Date.now()), true);
+    setFbStatus('✅ Đã kết nối Firebase · ' + hhmm(Date.now()) + (FB_REMOTE_INFO ? ' · ' + FB_REMOTE_INFO : ''), true);
   } catch(e){ setFbStatus('⚠️ ' + e.message, false); console.warn('[HUYEN-TUVI] Firebase', e); }
+}
+/* Lưu ngay khi thêm / xóa / đổi thứ tự khóa — không cần nhớ bấm 💾 */
+async function persistKeys(){
+  var c = getCfg(); c.keys = SKEYS.slice(); saveCfg(c, !!fbBase()); // có Firebase: giữ mốc đồng bộ cũ để biết máy khác có sửa sau không
+  if (lsGet('keyIdx', 0) >= SKEYS.length) lsSet('keyIdx', 0);
+  if (!fbBase()){ toast('Đã lưu trên máy (chưa cấu hình Firebase)'); return; }
+  setFbStatus('Đang ghi khóa lên Firebase…');
+  try { await fbPushCfg(); SKEYS = getCfg().keys.slice(); if ($('kCount')){ $('kCount').textContent = SKEYS.length; renderKeyList(); }
+        setFbStatus('✅ Đã lưu lên Firebase · ' + FB_REMOTE_INFO, true); toast('✅ Đã lưu khóa lên Firebase'); }
+  catch(e){ setFbStatus('⚠️ Khóa mới chỉ lưu trên máy này — Firebase lỗi: ' + e.message, false); toast('⚠️ Chưa lưu được lên Firebase'); }
 }
 
 /* ---------------- MẬT KHẨU CÀI ĐẶT ---------------- */
@@ -1058,7 +1096,7 @@ $('btnSet').onclick = function(){
     else { $('pwMsg').textContent = '❌ Sai mật khẩu'; $('pwMsg').style.color = 'var(--bad)'; $('pw').select(); }
   };
   $('pwOk').onclick = go2; $('pw').onkeydown = function(e){ if (e.key == 'Enter') go2(); };
-  setTimeout(function(){ $('pw').focus(); }, 50);
+  setTimeout(function(){ var p = $('pw'); if (p) p.focus(); }, 50);
 };
 
 /* ---------------- CÀI ĐẶT ---------------- */
@@ -1078,7 +1116,7 @@ function openSettings(){
   var c = getCfg(); SKEYS = c.keys.slice();
   openModal('<h2>⚙ Cài đặt AI &amp; đồng bộ</h2>' +
     '<h3>🔑 Khóa Google AI Studio (' + '<span id="kCount">' + SKEYS.length + '</span>)</h3>' +
-    '<p class="muted">Thứ tự từ trên xuống. Khóa nào hết hạn mức (HTTP 429) sẽ tạm nghỉ ' + CONFIG.QUOTA_COOLDOWN_MIN + ' phút và Huyền tự chuyển sang khóa kế tiếp; khóa sai/hết hạn nghỉ ' + CONFIG.BADKEY_COOLDOWN_H + ' giờ.</p>' +
+    '<p class="muted">Thêm / xóa / đổi thứ tự là tự lưu lên Firebase ngay. Thứ tự từ trên xuống. Khóa nào hết hạn mức (HTTP 429) sẽ tạm nghỉ ' + CONFIG.QUOTA_COOLDOWN_MIN + ' phút và Huyền tự chuyển sang khóa kế tiếp; khóa sai/hết hạn nghỉ ' + CONFIG.BADKEY_COOLDOWN_H + ' giờ.</p>' +
     '<div id="keyList"></div>' +
     '<label style="margin-top:8px">Thêm khóa (dán nhiều khóa, mỗi dòng một khóa)</label><textarea id="kNew" rows="2" placeholder="AQ.… hoặc AIza…"></textarea>' +
     '<div class="row" style="margin-top:6px"><button class="btn" id="kAdd">➕ Thêm khóa</button><button class="btn" id="kTestAll">🩺 Kiểm tra tất cả</button><button class="btn" id="kClearCool">↺ Bỏ nghỉ tất cả</button></div>' +
@@ -1090,19 +1128,22 @@ function openSettings(){
     '<pre id="sOut" class="muted" style="white-space:pre-wrap;margin-top:10px"></pre><p class="muted">Bản dựng ' + CONFIG.BUILD + '</p>');
   setFbStatus(FB_STATUS[0], FB_STATUS[1]);
   renderKeyList();
+  if (fbBase()) fbPullAll().then(function(){ if ($('keyList')){ SKEYS = getCfg().keys.slice(); $('kCount').textContent = SKEYS.length; renderKeyList(); } });
   $('sTemp').oninput = function(){ $('sTv').textContent = this.value; };
   $('keyList').onclick = async function(e){
     var b = e.target.closest('button'); if (!b) return;
-    if (b.dataset.kd != null){ if (!confirm('Xóa khóa #' + (+b.dataset.kd + 1) + '?')) return; SKEYS.splice(+b.dataset.kd, 1); }
-    else if (b.dataset.ku != null){ var i = +b.dataset.ku; if (i > 0){ var t = SKEYS[i]; SKEYS[i] = SKEYS[i - 1]; SKEYS[i - 1] = t; } }
+    var changed = false;
+    if (b.dataset.kd != null){ if (!confirm('Xóa khóa #' + (+b.dataset.kd + 1) + '?')) return; KDELETED[keyId(SKEYS[+b.dataset.kd])] = 1; SKEYS.splice(+b.dataset.kd, 1); changed = true; }
+    else if (b.dataset.ku != null){ var i = +b.dataset.ku; if (i > 0){ var t = SKEYS[i]; SKEYS[i] = SKEYS[i - 1]; SKEYS[i - 1] = t; changed = true; } }
     else if (b.dataset.kr != null){ clearCool(SKEYS[+b.dataset.kr]); }
     else if (b.dataset.kt != null){ await testKey(+b.dataset.kt); return; }
     $('kCount').textContent = SKEYS.length; renderKeyList();
+    if (changed) persistKeys();
   };
   $('kAdd').onclick = function(){
     var add = $('kNew').value.split(/[\n,;]+/).map(cleanKey).filter(function(k){ return k.length > 10 && SKEYS.indexOf(k) < 0; });
     if (!add.length){ toast('Không có khóa mới hợp lệ'); return; }
-    SKEYS = SKEYS.concat(add); $('kNew').value = ''; $('kCount').textContent = SKEYS.length; renderKeyList(); toast('Đã thêm ' + add.length + ' khóa — bấm 💾 Lưu để ghi');
+    SKEYS = SKEYS.concat(add); add.forEach(function(k){ delete KDELETED[keyId(k)]; KADDED[keyId(k)] = 1; }); $('kNew').value = ''; $('kCount').textContent = SKEYS.length; renderKeyList(); persistKeys();
   };
   $('kTestAll').onclick = async function(){ for (var i = 0; i < SKEYS.length; i++) await testKey(i); };
   $('kClearCool').onclick = function(){ clearCool(); renderKeyList(); toast('Đã bỏ trạng thái nghỉ của mọi khóa'); };

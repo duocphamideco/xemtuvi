@@ -1,4 +1,4 @@
-XEM TỬ VI — PWA Android và iPhone
+TỬ VI — PWA Android và iPhone
 
 1. Giải nén và tải toàn bộ file, thư mục lên cùng vị trí GitHub Pages (HTTPS).
 2. Nếu HTML có CSS, JavaScript hoặc ảnh rời, đưa lên thêm đúng cấu trúc gốc.
