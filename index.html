@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="vi"><head>
+<html lang="vi">
+<head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>HUYỀN · Tử Vi AI — IDECO</title>
@@ -116,22 +117,14 @@ textarea{resize:vertical}
 @media print{header,nav,.noprint,#aiCard,.toast{display:none!important}body{background:#fff;color:#000}.chart{min-width:0}}
 @media(max-width:640px){.hwrap{gap:8px}nav{margin-left:0}nav button{padding:7px 10px;font-size:13px}.card{padding:14px}}
 </style>
-
-    <link rel="manifest" href="./manifest.json?v=3-d20a48f3-4d9d5a8d">
-    <link rel="icon" href="./ideco-icon-192.png?v=3-d20a48f3-4d9d5a8d" type="image/png">
-    <link rel="apple-touch-icon" sizes="180x180" href="./ideco-apple-touch-icon.png?v=3-d20a48f3-4d9d5a8d">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-title" content="XEM TỬ VI">
-    <script src="./ideco-pwa.js?v=3-d20a48f3-4d9d5a8d" defer=""></script>
-  </head>
+</head>
 <body>
 <div id="gate"><div class="gbox">
   <div class="ic" style="width:64px;height:64px;font-size:34px;margin:0 auto 10px">⛵</div>
   <h2 style="margin:0">HUYỀN · TỬ VI AI</h2><p class="muted" style="margin:4px 0 16px">IDECO — vui lòng nhập mật khẩu để sử dụng</p>
   <div style="position:relative"><input id="gPass" type="password" placeholder="Mật khẩu" autocomplete="current-password" style="padding-right:46px">
   <button id="gEye" type="button" title="Hiện/ẩn mật khẩu" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:0;font-size:18px;cursor:pointer;color:var(--tx2)">👁</button></div>
-  <label style="display:flex;gap:6px;align-items:center;margin:10px 0 0;justify-content:center"><input type="checkbox" id="gRemember" checked="" style="width:auto"> Ghi nhớ trên máy này</label>
+  <label style="display:flex;gap:6px;align-items:center;margin:10px 0 0;justify-content:center"><input type="checkbox" id="gRemember" checked style="width:auto"> Ghi nhớ trên máy này</label>
   <button class="btn pri" id="gBtn" style="width:100%;margin-top:14px;padding:12px">Vào ứng dụng</button>
   <p id="gMsg" style="color:var(--bad);min-height:20px;margin:10px 0 0"></p>
 </div></div>
@@ -160,7 +153,7 @@ textarea{resize:vertical}
       <div><label>Năm xem vận hạn</label><input id="fView" type="number" min="1900" max="2200"></div>
     </div>
     <div class="row" style="margin-top:12px">
-      <label style="display:flex;gap:6px;align-items:center;margin:0"><input type="checkbox" id="fLateTy" checked="" style="width:auto"> Sinh từ 23h tính sang ngày hôm sau (giờ Tý)</label>
+      <label style="display:flex;gap:6px;align-items:center;margin:0"><input type="checkbox" id="fLateTy" checked style="width:auto"> Sinh từ 23h tính sang ngày hôm sau (giờ Tý)</label>
     </div>
     <div class="row" style="margin-top:14px">
       <button class="btn pri" id="btnLap">🔮 Lập lá số ngay</button>
@@ -253,7 +246,7 @@ textarea{resize:vertical}
    HUYỀN · TỬ VI AI — IDECO   (BUILD 20261108-1)
    ===================================================================== */
 var CONFIG = {
-  BUILD: '20261109-2',
+  BUILD: '20261109-4',
   // ===== TUYẾN AI =====
   PROVIDER: 'kie',              // tuyến chính: 'kie' (Kie.ai) hoặc 'google' (Google AI Studio)
   BACKUP_OTHER: true,           // hết khóa tuyến chính thì tự dùng tuyến còn lại
@@ -287,8 +280,17 @@ function $(id){ return document.getElementById(id); }
 function mod(a, n){ return ((a % n) + n) % n; }
 function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
 function toast(t){ var el = $('toast'); el.textContent = t; el.style.display = 'block'; clearTimeout(toast._t); toast._t = setTimeout(function(){ el.style.display = 'none'; }, 2600); }
-function lsGet(k, d){ try { var v = localStorage.getItem(LS + '-' + k); return v == null ? d : JSON.parse(v); } catch(e){ return d; } }
-function lsSet(k, v){ try { localStorage.setItem(LS + '-' + k, JSON.stringify(v)); } catch(e){} }
+var MEM = {}, LS_OK = true;
+function lsGet(k, d){
+  if (Object.prototype.hasOwnProperty.call(MEM, k)) return MEM[k] == null ? d : JSON.parse(JSON.stringify(MEM[k]));
+  try { var v = localStorage.getItem(LS + '-' + k); if (v != null){ MEM[k] = JSON.parse(v); return JSON.parse(v); } } catch(e){}
+  return d;
+}
+function lsSet(k, v){
+  MEM[k] = v == null ? v : JSON.parse(JSON.stringify(v));   // luôn giữ trong RAM dù trình duyệt chặn bộ nhớ
+  try { localStorage.setItem(LS + '-' + k, JSON.stringify(v)); }
+  catch(e){ if (LS_OK){ LS_OK = false; console.warn('[HUYEN-TUVI] trình duyệt chặn localStorage — chỉ lưu qua Firebase', e); } }
+}
 
 /* ---------------- Âm lịch (thuật toán Hồ Ngọc Đức, múi giờ +7) ---------------- */
 function jdFromDate(dd, mm, yy){
@@ -812,7 +814,16 @@ var PROVS = ['kie', 'google'];
 var PROV_NAME = { kie: 'Kie.ai', google: 'Google AI Studio' };
 function cleanKey(k){ return String(k || '').replace(/^\s*Bearer\s+/i, '').replace(/["'\s​-‍﻿]/g, ''); }
 function cleanList(a){ var out = []; (a || []).map(cleanKey).forEach(function(k){ if (k && out.indexOf(k) < 0) out.push(k); }); return out; }
-function getCfg(){
+function isGoogleKey(k){ return /^AIza/.test(k) || /^AQ\./.test(k); }
+/* Khóa dán nhầm mục: khóa không phải dạng Google (AIza…/AQ.…) nằm trong mục Google → chuyển sang Kie, và ngược lại */
+function fixKeyPlaces(c){
+  var g = [], k = c.kieKeys.slice();
+  c.googleKeys.forEach(function(x){ if (isGoogleKey(x)) g.push(x); else if (k.indexOf(x) < 0) k.push(x); });
+  var k2 = []; k.forEach(function(x){ if (isGoogleKey(x)){ if (g.indexOf(x) < 0) g.push(x); } else k2.push(x); });
+  c.kieKeys = k2; c.googleKeys = g; return c;
+}
+function getCfg(){ return fixKeyPlaces(getCfgRaw()); }
+function getCfgRaw(){
   var c = lsGet('cfg', {});
   return {
     provider: c.provider || CONFIG.PROVIDER,
@@ -828,7 +839,8 @@ function getCfg(){
     updatedAt: c.updatedAt || 0
   };
 }
-function saveCfg(c, keepTime){ if (!keepTime) c.updatedAt = Date.now(); var o = Object.assign({}, c); delete o.keys; delete o.models; lsSet('cfg', o); }
+var CFG_VER = 0;
+function saveCfg(c, keepTime){ CFG_VER++; if (!keepTime) c.updatedAt = Date.now(); var o = Object.assign({}, c); delete o.keys; delete o.models; lsSet('cfg', o); }
 function provKeys(c, p){ return p == 'kie' ? c.kieKeys : c.googleKeys; }
 function provModels(c, p){ return p == 'kie' ? c.kieModels : c.googleModels; }
 function keyId(k){ return k.slice(0, 4) + k.slice(-8); }
@@ -850,7 +862,12 @@ function classify(status, msg){
 }
 /* Lấy chữ trả lời từ 1 mẩu dữ liệu Gemini (kể cả khi Kie bọc trong {code,msg,data}) */
 function pickText(j){
+  if (typeof j == 'string'){ try { j = JSON.parse(j); } catch(x){ return { text: '' }; } }
   if (!j || typeof j != 'object') return { text: '' };
+  if (Array.isArray(j)){ var acc = '', fin; j.forEach(function(x){ var r = pickText(x); acc += r.text; if (r.finish) fin = r.finish; }); return { text: acc, finish: fin }; }
+  if (j.choices && j.choices[0]){ var ch = j.choices[0], tx = (ch.delta && ch.delta.content) || (ch.message && ch.message.content) || ch.text || '';
+    return { text: typeof tx == 'string' ? tx : '', finish: ch.finish_reason || null }; }
+  if (typeof j.data == 'string'){ var r2 = pickText(j.data); if (r2.text) return r2; }
   if (j.data && typeof j.data == 'object' && !j.candidates) { var inner = pickText(j.data); if (inner.text || inner.finish) return inner; }
   var cand = j.candidates && j.candidates[0], t = '';
   if (cand) ((cand.content && cand.content.parts) || []).forEach(function(pt){ if (pt.text && !pt.thought) t += pt.text; });
@@ -892,7 +909,7 @@ async function callAI(prov, key, model, system, contents, onText, mode){
   function done(){ clearTimeout(total); clearTimeout(stall); }
   function mkErr(status, msg){
     var e = new Error((status ? 'HTTP ' + status + ' — ' : '') + msg); e.status = status; e.kind = classify(status, msg);
-    if (e.kind == 'bad') e.kind = mode == 0 ? 'retryplain' : 'model';
+    if (e.kind == 'bad' || (mode == 0 && (e.kind == 'other' || e.kind == 'model') && status >= 400 && status != 404)) e.kind = mode == 0 ? 'retryplain' : (e.kind == 'bad' ? 'model' : e.kind);
     return e;
   }
   try {
@@ -924,13 +941,16 @@ async function callAI(prov, key, model, system, contents, onText, mode){
     done();
     if (!sseSeen && raw.trim()){
       // Không phải SSE: có thể là mảng JSON hoặc một object (Kie hay trả HTTP 200 kèm {code,msg})
-      var all = null; try { all = JSON.parse(raw); } catch(x){}
-      (Array.isArray(all) ? all : [all]).forEach(function(j){ if (!j) return; var pe3 = pickError(j); if (pe3){ inErr = pe3; return; } var t = pickText(j); if (t.finish) finish = t.finish; got += t.text; });
+      var all = null, objs = [];
+      try { all = JSON.parse(raw); objs = Array.isArray(all) ? all : [all]; }
+      catch(x){ raw.split(/\r?\n/).forEach(function(l){ l = l.trim().replace(/^,|,$/g, '').replace(/^\[|\]$/g, ''); if (!l) return; try { objs.push(JSON.parse(l)); } catch(y){} }); }
+      objs.forEach(function(j){ if (!j) return; var pe3 = pickError(j); if (pe3){ inErr = pe3; return; } var t = pickText(j); if (t.finish) finish = t.finish; got += t.text; });
+      if (!got && !inErr){ var m, re = /"text"\s*:\s*"((?:[^"\\]|\\.)*)"/g; while ((m = re.exec(raw))){ try { got += JSON.parse('"' + m[1] + '"'); } catch(z){} } }
       if (got) onText(got);
     }
     if (!got){
       if (inErr) throw mkErr(inErr.status, inErr.msg);
-      var e2 = new Error('Máy chủ trả về rỗng' + (finish ? ' (' + finish + ')' : '')); e2.kind = 'other'; throw e2;
+      var e2 = new Error('HTTP ' + res.status + ' — không đọc được câu trả lời' + (finish ? ' (' + finish + ')' : '') + '. Máy chủ trả về: ' + (raw.trim().slice(0, 300) || '(rỗng)')); e2.status = res.status; e2.kind = mode == 0 ? 'retryplain' : 'other'; throw e2;
     }
     return { text: got, finish: finish };
   } catch(err){
@@ -950,7 +970,7 @@ async function geminiStream(system, contents, onText, onNote){
   var other = cfg.provider == 'kie' ? 'google' : 'kie';
   if (cfg.backup && provKeys(cfg, other).length) provs.push(other);
   if (!provKeys(cfg, cfg.provider).length && provKeys(cfg, other).length && provs.indexOf(other) < 0) provs.push(other);
-  var lastErr = null, anyKey = false, firstTry = true;
+  var lastErr = null, anyKey = false, firstTry = true, trail = [], mainErr = null;
   for (var pi = 0; pi < provs.length; pi++){
     var prov = provs[pi], keys = provKeys(cfg, prov), models = provModels(cfg, prov);
     if (!keys.length) continue; anyKey = true;
@@ -971,7 +991,9 @@ async function geminiStream(system, contents, onText, onNote){
           console.log('[HUYEN-TUVI] OK', PROV_NAME[prov], 'khóa #' + (ki + 1), model, r.finish);
           return r;
         } catch(e){
-          lastErr = e; console.warn('[HUYEN-TUVI]', PROV_NAME[prov], 'khóa #' + (ki + 1), model, e.kind, e.message);
+          lastErr = e; if (!mainErr && prov == cfg.provider) mainErr = e;
+          trail.push({ prov: prov, ki: ki, model: model, kind: e.kind, msg: e.message });
+          console.warn('[HUYEN-TUVI]', PROV_NAME[prov], 'khóa #' + (ki + 1), model, e.kind, e.message);
           if (e.kind == 'stop') throw e;
           if (e.kind == 'net') break;
           if (e.kind == 'quota'){ setCool(key, CONFIG.QUOTA_COOLDOWN_MIN * 60000, 'Hết hạn mức'); break; }
@@ -981,11 +1003,21 @@ async function geminiStream(system, contents, onText, onNote){
     }
   }
   if (!anyKey) throw new Error('Chưa có khóa API — vào ⚙ Cài đặt để thêm khóa Kie.ai.');
-  var err = new Error('Đã thử hết các khóa nhưng chưa được. ' + (lastErr ? lastErr.message : '')); err.kind = lastErr && lastErr.kind; throw err;
+  var main = mainErr || lastErr;
+  var err = new Error((main ? (mainErr ? PROV_NAME[cfg.provider] + ': ' : '') + main.message : 'Không gọi được AI'));
+  err.kind = main && main.kind; err.trail = trail; throw err;
+}
+function errHtml(e){
+  var h = '<p style="color:var(--bad)">⚠️ ' + esc(explainErr(e)) + '</p>';
+  if (e.trail && e.trail.length){
+    h += '<details open><summary class="muted" style="cursor:pointer">Chi tiết ' + e.trail.length + ' lần thử</summary><ul class="muted" style="font-size:13.5px">' +
+      e.trail.map(function(t){ return '<li><b>' + PROV_NAME[t.prov] + '</b> · khóa #' + (t.ki + 1) + ' · ' + esc(t.model) + ' → ' + esc(t.msg) + '</li>'; }).join('') + '</ul></details>';
+  }
+  return h;
 }
 function explainErr(e){
   var m = e.message || String(e);
-  if (/Failed to fetch|NetworkError|Load failed/i.test(m)) return 'Không kết nối được máy chủ AI (mạng chặn, CORS, hoặc mở bằng file:// trên một số trình duyệt). Hãy mở qua GitHub Pages / https. Chi tiết: ' + m;
+  if (/Failed to fetch|NetworkError|Load failed/i.test(m)) return 'Trình duyệt không gọi được máy chủ AI — thường do máy chủ chặn gọi trực tiếp từ trang web (CORS) (mạng chặn, CORS, hoặc mở bằng file:// trên một số trình duyệt). Hãy mở qua GitHub Pages / https. Chi tiết: ' + m;
   if (/401|403|UNAUTHENTICATED|unauthori|credential|API key|authentication/i.test(m)) return 'Khóa API không hợp lệ hoặc đã hết hạn. Vào ⚙ Cài đặt kiểm tra / thêm khóa. Chi tiết: ' + m;
   if (/429|402|quota|RESOURCE_EXHAUSTED|credit|insufficient/i.test(m)) return 'Các khóa đang hết hạn mức / hết credit. Thêm khóa mới trong ⚙ Cài đặt hoặc thử lại sau. Chi tiết: ' + m;
   return m;
@@ -1014,7 +1046,7 @@ async function askAI(question, label){
     CHAT.push({ role: 'model', parts: [{ text: r.text }] });
   } catch(e){
     CHAT.pop();
-    out.innerHTML = '<p style="color:var(--bad)">⚠️ ' + esc(explainErr(e)) + '</p>';
+    out.innerHTML = errHtml(e);
   }
   if (CHAT.length && CHAT[0].parts[0].text.indexOf('DỮ LIỆU LÁ SỐ') != 0){ CHAT = []; }
   BUSY = false; $('askBtn').disabled = false; $('btnStop').style.display = 'none';
@@ -1079,7 +1111,7 @@ $('btnHop').onclick = async function(){
   try {
     var res = await geminiStream(SYSTEM_PROMPT, [{ role: 'user', parts: [{ text: prompt }] }], function(t){ out.innerHTML = md(t) + '<span class="typing"></span>'; }, function(n){ out.innerHTML = '<span class="typing">' + esc(n) + '</span>'; });
     out.innerHTML = md(res.text);
-  } catch(e){ out.innerHTML = '<p style="color:var(--bad)">⚠️ ' + esc(explainErr(e)) + '</p>'; }
+  } catch(e){ out.innerHTML = errHtml(e); }
 };
 
 /* ---------------- FIREBASE REALTIME (REST, không cần SDK) ---------------- */
@@ -1115,9 +1147,9 @@ function mergeList(local, remote, remoteNewer){
   return out;
 }
 /* Ghi cấu hình lên Firebase — luôn GỘP với danh sách khóa đang có để không máy nào làm mất khóa của máy khác */
-async function fbPushCfg(){
+async function fbPushCfg(cIn){
   if (!fbBase()) return;
-  var c = getCfg(), rc = await fbReq('config');
+  var c = cIn ? fixKeyPlaces(JSON.parse(JSON.stringify(cIn))) : getCfg(), rc = await fbReq('config');
   if (rc){
     var newer = (rc.updatedAt || 0) > (c.updatedAt || 0);
     c.kieKeys = mergeList(c.kieKeys, rc.kieKeys, newer);
@@ -1127,6 +1159,7 @@ async function fbPushCfg(){
   await fbReq('config', 'PUT', cfgForRemote(c, now));
   c.updatedAt = now; saveCfg(c, true); KADDED = {};
   FB_REMOTE_INFO = 'Trên Firebase: ' + c.kieKeys.length + ' khóa Kie + ' + c.googleKeys.length + ' khóa Google · ' + hhmm(now);
+  console.log('[HUYEN-TUVI] đã ghi Firebase', FB_REMOTE_INFO);
 }
 async function fbPushProfiles(){
   if (!fbBase()) return;
@@ -1140,9 +1173,11 @@ async function fbPullAll(){
     var ra = await fbReq('auth'), la = lsGet('auth', null);
     if (ra && ra.sha && (!la || (ra.updatedAt || 0) > (la.updatedAt || 0))){ lsSet('auth', ra); gateRecheck(); }
     // 2) Cấu hình AI + khóa
+    var ver0 = CFG_VER;
     var rc = await fbReq('config'), local = getCfg();
     var rKie = cleanList(rc && rc.kieKeys), rGg = cleanList(rc && (rc.googleKeys || rc.keys));
-    if (rc && (rKie.length || rGg.length) && (rc.updatedAt || 0) >= (local.updatedAt || 0)){
+    if (CFG_VER != ver0){ /* người dùng vừa sửa khóa trong lúc đang tải → giữ bản trên máy, đã có lệnh đẩy riêng */ }
+    else if (rc && (rKie.length || rGg.length) && (rc.updatedAt || 0) >= (local.updatedAt || 0)){
       saveCfg({ provider: rc.provider || local.provider, backup: rc.backup != null ? rc.backup : local.backup, kieKeys: rKie, googleKeys: rGg,
         kieModels: rc.kieModels || local.kieModels, googleModels: rc.googleModels || rc.models || local.googleModels, kieUrl: rc.kieUrl || local.kieUrl,
         think: rc.think || local.think, temp: rc.temp != null ? rc.temp : local.temp, fbUrl: local.fbUrl, updatedAt: rc.updatedAt || 1 }, true);
@@ -1260,7 +1295,14 @@ function openSettings(){
     if (b.dataset.add){
       var add = $('kNew-' + p).value.split(/[\n,;]+/).map(cleanKey).filter(function(k){ return k.length > 10 && list.indexOf(k) < 0; });
       if (!add.length){ toast('Không có khóa mới hợp lệ'); return; }
-      add.forEach(function(k){ list.push(k); delete KDELETED[keyId(k)]; KADDED[keyId(k)] = 1; }); $('kNew-' + p).value = ''; changed = true;
+      var moved = 0;
+      add.forEach(function(k){
+        var target = isGoogleKey(k) ? 'google' : 'kie'; if (target != p) moved++;
+        if (SKEYS[target].indexOf(k) < 0) SKEYS[target].push(k); delete KDELETED[keyId(k)]; KADDED[keyId(k)] = 1;
+      });
+      $('kNew-' + p).value = ''; changed = true;
+      if (moved) toast('Đã tự xếp ' + moved + ' khóa vào đúng mục ' + (p == 'kie' ? 'Google' : 'Kie.ai'));
+      PROVS.forEach(renderKeyList);
     }
     else if (b.dataset.testall){ for (var i = 0; i < list.length; i++) await testKey(p, i); return; }
     else if (b.dataset.kd != null){ if (!confirm('Xóa khóa #' + (+b.dataset.kd + 1) + '?')) return; KDELETED[keyId(list[+b.dataset.kd])] = 1; list.splice(+b.dataset.kd, 1); changed = true; }
@@ -1276,7 +1318,7 @@ function openSettings(){
     PROVS.forEach(function(p){ lsSet('modelIdx-' + p, 0); });
     if (fbBase()){
       setFbStatus('Đang ghi lên Firebase…');
-      try { await fbPushCfg(); await fbPushProfiles(); setFbStatus('✅ Đã lưu & đồng bộ · ' + FB_REMOTE_INFO, true); toast('Đã lưu & đồng bộ Firebase'); }
+      try { await fbPushCfg(c3); await fbPushProfiles(); setFbStatus('✅ Đã lưu & đồng bộ · ' + FB_REMOTE_INFO, true); toast('Đã lưu & đồng bộ Firebase'); }
       catch(err){ setFbStatus('⚠️ Lưu trên máy được, nhưng Firebase lỗi: ' + err.message, false); }
     } else toast('Đã lưu trên máy này');
   };
@@ -1314,7 +1356,7 @@ async function persistKeys(){
   PROVS.forEach(function(p){ if (lsGet('keyIdx-' + p, 0) >= SKEYS[p].length) lsSet('keyIdx-' + p, 0); });
   if (!fbBase()){ toast('Đã lưu trên máy (chưa cấu hình Firebase)'); return; }
   setFbStatus('Đang ghi khóa lên Firebase…');
-  try { await fbPushCfg(); var c2 = getCfg(); SKEYS = { kie: c2.kieKeys.slice(), google: c2.googleKeys.slice() }; PROVS.forEach(renderKeyList);
+  try { await fbPushCfg(c); var c2 = getCfg(); SKEYS = { kie: c2.kieKeys.slice(), google: c2.googleKeys.slice() }; PROVS.forEach(renderKeyList);
         setFbStatus('✅ Đã lưu lên Firebase · ' + FB_REMOTE_INFO, true); toast('✅ Đã lưu khóa lên Firebase'); }
   catch(e){ setFbStatus('⚠️ Khóa mới chỉ lưu trên máy này — Firebase lỗi: ' + e.message, false); toast('⚠️ Chưa lưu được lên Firebase'); }
 }
@@ -1342,10 +1384,9 @@ async function testKey(prov, i){
   var last = lsGet('last', null);
   if (last){ fillForm(last); }
   gateRecheck();
-  fbPullAll();
+  fbPullAll().then(function(){ if (!LS_OK) toast('⚠️ Trình duyệt đang chặn bộ nhớ máy — khóa chỉ lấy từ Firebase'); });
   document.addEventListener('keydown', function(e){ if (e.key == 'Escape') closeModal(); });
 })();
 </script>
-
-
-</body></html>
+</body>
+</html>
